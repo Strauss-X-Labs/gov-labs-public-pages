@@ -2,7 +2,8 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e3e9e5">
 <title>המסע החדש של ג'ורג'</title>
 
 <script>
@@ -187,13 +188,13 @@ const DURATION = 87; // אורך כולל בשניות
   --dur:.7s; --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%}
-body{background:#e3e9e5;font-family:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+body{touch-action:manipulation;-webkit-tap-highlight-color:transparent;background:#e3e9e5;font-family:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
 b{font-weight:700}
 
 /* ---------- player & stage ---------- */
-#player{position:absolute;left:50%;top:50%;width:1600px;height:976px;transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:center}
-#stage{position:relative;width:1600px;height:900px;border-radius:24px;overflow:hidden;
+#player{position:fixed;left:50%;top:50%;width:var(--PW,1600px);height:var(--PH,976px);transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:center}
+#stage{position:relative;width:var(--W,1600px);height:var(--H,900px);border-radius:24px;overflow:hidden;
   background:
     radial-gradient(circle at 88% 8%, rgba(47,180,122,.11), transparent 38%),
     radial-gradient(circle at 8% 92%, rgba(47,180,122,.09), transparent 42%),
@@ -209,7 +210,7 @@ b{font-weight:700}
 .fill{position:absolute;inset:0}
 .pin{position:absolute;transform:translate(-50%,-50%)}
 .pin.b{transform:translate(-50%,-100%)}
-svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
+svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);overflow:visible}
 
 /* ---------- generic reveal ---------- */
 [data-at]{opacity:0;transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease)}
@@ -312,8 +313,10 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
 .topbar nav span.active{background:var(--green-soft);color:var(--green);font-weight:700}
 .me{margin-inline-start:auto;display:flex;align-items:center;gap:10px;font-size:17px;color:var(--muted)}
 .me b{color:var(--ink)}
+.app-scale{position:absolute;inset:0}
 .pages{position:absolute;top:64px;left:0;right:0;bottom:0}
-.page{position:absolute;inset:0;padding:20px 30px;transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.page-in{position:relative}
+.page{position:absolute;inset:0;overflow:hidden;padding:20px 30px;transition:opacity .6s var(--ease),transform .6s var(--ease)}
 .p1.past{opacity:0;transform:translateX(70px)}
 .p2{opacity:0;transform:translateX(-70px)}
 .p2.cur,.p2.past{opacity:1;transform:none}
@@ -452,7 +455,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
 /* ---------- scene 8: deal ---------- */
 .dline{stroke:var(--green);stroke-width:9;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1}
 .dfac{display:flex;flex-direction:column;align-items:center;gap:6px}
-.dfac svg{width:260px;height:217px}
+.dfac > svg{width:260px;height:217px}
 .dfac b{font-size:28px}
 .dfac small{font-size:18px;color:var(--muted)}
 .hs{width:170px;height:170px;border-radius:50%;background:#fff;border:6px solid var(--green);display:grid;place-items:center;font-size:90px;box-shadow:0 18px 44px rgba(31,138,91,.25)}
@@ -521,6 +524,172 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
 /* ---------- music button ---------- */
 .btn.music.needs{animation:needs 1.6s ease-in-out infinite}
 @keyframes needs{0%,100%{box-shadow:0 2px 8px rgba(0,0,0,.08),0 0 0 0 rgba(31,138,91,.45)}50%{box-shadow:0 2px 8px rgba(0,0,0,.08),0 0 0 9px rgba(31,138,91,0)}}
+
+/* ==========================================================
+   Portrait (phones held upright): 900×1500 frame, re-laid-out scenes
+   ========================================================== */
+.portrait .cap{flex-wrap:wrap;align-content:center;row-gap:4px;column-gap:14px;font-size:56px;line-height:1.22;padding:0 50px;text-align:center}
+.portrait .caps{bottom:70px;height:260px}
+.portrait #persona{top:34px;right:34px;font-size:30px;gap:16px;padding:8px 8px 8px 28px}
+.portrait #persona .av.md{width:68px;height:68px}
+.portrait .controls{height:190px;flex-wrap:wrap;justify-content:center;gap:20px 18px;padding:28px 10px 0}
+.portrait .bar{order:-2;flex:1 1 620px;height:16px;border-radius:9px}
+.portrait .time{order:-1;font-size:28px;min-width:170px}
+.portrait .btn{font-size:30px;padding:16px 30px;gap:12px;border-radius:40px}
+.portrait .btn svg{width:28px;height:28px}
+
+/* scene 0 */
+.portrait .factory-main{left:225px;top:300px}
+.portrait .fac-label{font-size:34px}
+.portrait .silo{left:690px;top:400px}
+.portrait .silo-label{font-size:28px}
+.portrait .oldway{left:0;top:790px;width:900px;text-align:center}
+.portrait .ow-title{font-size:30px;margin-bottom:22px}
+.portrait .chip{font-size:34px;margin:0 auto 18px;padding:18px 30px}
+
+/* scenes 1–2 */
+.portrait .phone-wrap{left:280px;top:255px}
+.portrait .pulses{left:450px;top:632px}
+.portrait .nb{font-size:21px}
+.portrait .nh{font-size:17px}
+.portrait .wow{width:70px;height:70px;font-size:46px}
+
+/* scenes 3–4: the app becomes a phone-sized app, scaled up */
+.portrait .appwin{left:30px;top:130px;width:840px;height:1050px;border-radius:44px}
+.portrait .app-scale{inset:auto;left:0;top:0;width:390px;height:487.5px;transform:scale(2.1538);transform-origin:0 0}
+.portrait .topbar{height:50px;padding:0 14px;gap:10px}
+.portrait .topbar nav,.portrait .me-role{display:none}
+.portrait .brand{font-size:17px;gap:8px}
+.portrait .brand-ico{width:30px;height:30px;border-radius:9px}
+.portrait .brand-ico svg{width:22px;height:22px}
+.portrait .me{font-size:14px;gap:6px}
+.portrait .me .av.sm{width:30px;height:30px}
+.portrait .pages{top:50px}
+.portrait .page{padding:14px}
+.portrait .op-head{flex-direction:column;align-items:stretch;justify-content:flex-start;height:auto;gap:8px;margin-bottom:12px}
+.portrait .op-head h1{font-size:22px;line-height:1.25}
+.portrait .crumb{font-size:13px;margin-bottom:2px}
+.portrait .tags{padding:0;gap:8px}
+.portrait .tag{font-size:13px;padding:4px 11px}
+.portrait .share{display:none}
+.portrait .card{padding:10px 12px;border-radius:14px}
+.portrait .lbl{font-size:12px;margin-bottom:4px}
+.portrait .lbl.big{font-size:15px;margin-bottom:8px}
+.portrait .op-grid{grid-template-columns:1fr 1fr;grid-template-areas:"gal gal" "sup sup" "map pie" "map clean" "doc doc";height:auto;gap:10px}
+.portrait .op-grid .col{display:contents}
+.portrait .gallery{grid-area:gal;padding:8px;gap:8px}
+.portrait .tile{flex:1;width:auto;height:96px;border-radius:9px}
+.portrait .supplier{grid-area:sup}
+.portrait .mapcard{grid-area:map}
+.portrait .piecard{grid-area:pie}
+.portrait .cleancard{grid-area:clean}
+.portrait .doccard{grid-area:doc;gap:10px}
+.portrait .sup-name{font-size:17px;gap:8px}
+.portrait .sup-ico,.portrait .sup-ico svg{width:34px;height:29px}
+.portrait .rating{gap:8px;margin:8px 0}
+.portrait .stars{font-size:26px}
+.portrait .rnum{font-size:24px}
+.portrait .rlbl{font-size:12px}
+.portrait .badge{font-size:12.5px;padding:4px 10px;gap:5px}
+.portrait .badge svg{width:13px;height:13px}
+.portrait .glowring{border-radius:16px}
+.portrait .il{width:104px;height:170px}
+.portrait .il-txt{font-size:16px}
+.portrait .dist{font-size:17px}
+.portrait .pie-row{flex-direction:column;align-items:flex-start;gap:6px}
+.portrait .pie{width:66px;height:66px}
+.portrait .legend{flex-direction:row;flex-wrap:wrap;gap:3px 10px;font-size:12px}
+.portrait .legend div{gap:4px}
+.portrait .legend b{min-width:0}
+.portrait .legend i{width:9px;height:9px;border-radius:3px}
+.portrait .clean-val{font-size:14px}
+.portrait .cbar{height:10px;margin:4px 0}
+.portrait .cends{font-size:11px}
+.portrait .doccard .lbl{top:8px;right:12px}
+.portrait .doc-ico{width:28px;height:34px;margin-top:16px}
+.portrait .doc-txt{margin-top:16px}
+.portrait .doc-txt b{font-size:15px}
+.portrait .doc-txt small{font-size:12px}
+.portrait .doc-dl{width:32px;height:32px;font-size:16px;border-radius:9px;margin-top:16px}
+.portrait .cta-row{margin-top:12px;height:46px}
+.portrait .cta{font-size:16px;padding:10px 20px;border-radius:12px;gap:8px}
+.portrait .appwin .finger{font-size:34px}
+.portrait .an-grid{grid-template-columns:1fr;height:auto;gap:10px}
+.portrait .ring-box,.portrait .ring{width:170px;height:170px}
+.portrait .ring-center b{font-size:44px}
+.portrait .ring-center span{font-size:15px}
+.portrait .ring-note{margin-top:8px;font-size:13px}
+.portrait .act{gap:10px;padding:9px 2px}
+.portrait .ai{width:36px;height:36px}
+.portrait .ai svg{width:19px;height:19px}
+.portrait .act b{font-size:16px}
+.portrait .act small{font-size:12px}
+.portrait .roi .roi-k{font-size:12px}
+.portrait .roi-v b{font-size:32px}
+.portrait .roi-v span{font-size:15px}
+.portrait .sep{margin:8px 0}
+.portrait .roi-v2 b{font-size:26px}
+.portrait .months{height:18px;margin-top:8px;gap:3px}
+.portrait .months span{border-radius:4px}
+.portrait .months-lbl{font-size:11px}
+
+/* scene 5 */
+.portrait .table{width:400px;height:560px}
+.portrait .mini{width:340px;padding:18px 22px}
+.portrait .mini-h{font-size:20px}
+.portrait .mini-t{font-size:26px}
+.portrait .mini-s{font-size:20px;flex-wrap:wrap}
+.portrait .mini-s .tag{font-size:18px}
+.portrait .av.big{width:120px;height:120px}
+.portrait .seat-in b{font-size:32px}
+.portrait .seat-in small{font-size:24px}
+.portrait .bubble-in{font-size:32px;padding:14px 24px}
+.portrait .pin.b.alt{transform:translate(-50%,0)}
+.portrait .alt .bubble-in{transform-origin:50% 0}
+.portrait .alt .bubble-in::after{top:-11px;bottom:auto;border:11px solid transparent;border-top:0;border-bottom-color:#fff}
+.portrait .alt .bubble-in.g::after{border-bottom-color:var(--green)}
+
+/* scene 6 */
+.portrait .road-lbl{font-size:30px}
+.portrait .dist-chip{font-size:28px;padding:8px 22px}
+
+/* scene 7 */
+.portrait .lab-lbl{font-size:32px}
+.portrait .gnum{font-size:64px}
+.portrait .ok-lbl{font-size:52px}
+.portrait .coin-val{font-size:52px}
+.portrait .coin-lbl{font-size:30px}
+
+/* scene 8 */
+.portrait .dfac > svg{width:230px;height:192px}
+.portrait .dfac b{font-size:36px}
+.portrait .dfac small{font-size:26px}
+.portrait .hs{width:160px;height:160px;font-size:84px}
+.portrait .confetti{left:450px;top:600px}
+
+/* scene 9 */
+.portrait .orb-in svg{width:120px;height:100px}
+.portrait .orb-ring{top:50px;width:150px;height:150px;margin:-75px 0 0 -75px}
+.portrait .newb{font-size:26px;bottom:108px;padding:6px 16px}
+.portrait .fly{font-size:26px;padding:12px 22px}
+.portrait .deal-node .dn{width:120px;height:120px;font-size:60px}
+.portrait .deal-node small{font-size:26px}
+.portrait .logo-core{left:-115px;top:-115px;width:230px;height:230px}
+.portrait .logo-core svg{width:140px;height:140px}
+
+/* scene 10 */
+.portrait .tons b{font-size:170px}
+.portrait .tons span{font-size:64px}
+.portrait .tons-sub{font-size:54px}
+.portrait .lf-lbl{font-size:32px}
+.portrait .plus{font-size:42px}
+
+/* end */
+.portrait .end-logo{width:180px;height:180px;border-radius:48px}
+.portrait .end-logo svg{width:124px;height:124px}
+.portrait .end-name{font-size:132px}
+.portrait .end-tag{font-size:52px;text-align:center;padding:0 70px;line-height:1.3}
+.portrait .end-small{font-size:28px;bottom:80px;padding:0 50px;text-align:center;line-height:1.4}
 
 /* ---------- reduced motion ---------- */
 .reduced{--dur:.3s}
@@ -630,7 +799,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
         <div class="chip" data-at="1.25" data-a="fromL"><span>📞</span><span data-t="s0_old2"></span></div>
         <div class="chip" data-at="1.5" data-a="fromL"><span>📧</span><span data-t="s0_old3"></span></div>
       </div>
-      <div class="george-fig" style="left:598px;top:205px;width:160px" data-at="0.35" data-a="up"><i class="shadow"></i><svg viewBox="0 0 200 440"><use href="#i-george"/></svg></div>
+      <div class="george-fig" data-lp="598,205,160" data-pp="85,370,140" data-at="0.35" data-a="up"><i class="shadow"></i><svg viewBox="0 0 200 440"><use href="#i-george"/></svg></div>
       <div class="factory-main" data-at="0.1" data-a="up">
         <svg class="fac-svg" viewBox="0 0 120 100">
           <g class="smoke"><circle cx="95.5" cy="8" r="4"/><circle cx="95.5" cy="8" r="4"/><circle cx="95.5" cy="8" r="4"/></g>
@@ -649,7 +818,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
   <section class="view" id="v-phone">
     <div class="fill" data-scene="s1">
       <div class="pulses" data-on="2.05"><span></span><span></span><span></span></div>
-      <div class="george-fig" id="georgeS1" style="left:1085px;top:300px;width:165px" data-at="0.6" data-a="fromR"><i class="shadow"></i><div class="wow" data-at="2.35" data-a="pop" data-t="s1_wow"></div><svg viewBox="0 0 200 440"><use href="#i-george"/></svg></div>
+      <div class="george-fig" id="georgeS1" data-lp="1085,300,165" data-pp="722,860,140" data-at="0.6" data-a="fromR"><i class="shadow"></i><div class="wow" data-at="2.35" data-a="pop" data-t="s1_wow"></div><svg viewBox="0 0 200 440"><use href="#i-george"/></svg></div>
       <div class="phone-wrap" id="phoneWrap">
         <div class="phone" data-at="0" data-a="rise">
           <div class="shake" data-on="2.1">
@@ -679,16 +848,16 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
   <!-- ===== Scenes 3–4 · app ===== -->
   <section class="view" id="v-app">
     <div class="fill" data-scene="s3">
-      <div class="appwin" data-at="0" data-a="zoomin">
+      <div class="appwin" data-at="0" data-a="zoomin"><div class="app-scale">
         <div class="topbar">
           <div class="brand"><span class="brand-ico"><svg viewBox="0 0 64 64"><use href="#i-logo"/></svg></span><span data-t="sys"></span></div>
           <nav><span class="active" data-t="nav1"></span><span data-t="nav2"></span><span data-t="nav3"></span></nav>
-          <div class="me"><span class="av george sm"><svg viewBox="30 36 140 140"><use href="#i-george" width="200" height="440"/></svg></span><span><b data-t="george_name"></b> · <span data-t="george_role"></span></span></div>
+          <div class="me"><span class="av george sm"><svg viewBox="30 36 140 140"><use href="#i-george" width="200" height="440"/></svg></span><span><b data-t="george_name"></b><span class="me-role"> · <span data-t="george_role"></span></span></span></div>
         </div>
         <div class="pages">
 
           <!-- Scene 3 · opportunity card -->
-          <div class="page p1" data-scene="s3">
+          <div class="page p1" data-scene="s3"><div class="page-in" id="p1in">
             <div class="op-head" data-at="0.5" data-a="up">
               <div><div class="crumb" data-t="s3_crumb"></div><h1 data-t="s3_title"></h1></div>
               <div class="tags"><span class="tag tag-green" data-t="s3_tag_match"></span><span class="tag" data-t="s3_tag_price"></span></div>
@@ -762,10 +931,10 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
                 <div class="finger" id="finger3">👆</div>
               </div>
             </div>
-          </div>
+          </div></div>
 
           <!-- Scene 4 · match analysis -->
-          <div class="page p2" data-scene="s4">
+          <div class="page p2" data-scene="s4"><div class="page-in" id="p2in">
             <div class="op-head" data-at="0.3" data-a="up">
               <div><div class="crumb" data-t="s4_crumb"></div><h1 data-t="s4_title"></h1></div>
               <div class="share" data-at="9.4" data-a="scale">👥 <span data-t="s4_share"></span></div>
@@ -798,32 +967,32 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
                 <div class="months-lbl"><span data-t="s4_m1"></span><span data-t="s4_m12"></span></div>
               </div>
             </div>
-          </div>
+          </div></div>
 
         </div>
-      </div>
+      </div></div>
     </div>
   </section>
 
   <!-- ===== Scene 5 · consultation ===== -->
   <section class="view" id="v-meet">
     <div class="fill" data-scene="s5">
-      <div class="pin" style="left:800px;top:455px"><div class="table" data-at="0.1" data-a="scale"></div></div>
-      <div class="pin" style="left:800px;top:455px">
+      <div class="pin" data-lp="800,455" data-pp="450,700"><div class="table" data-at="0.1" data-a="scale"></div></div>
+      <div class="pin" data-lp="800,455" data-pp="450,700">
         <div class="mini" data-at="0.5" data-a="pop">
           <div class="mini-h"><span class="brand-ico"><svg viewBox="0 0 64 64"><use href="#i-logo"/></svg></span><span data-t="sys"></span></div>
           <div class="mini-t" data-t="s3_title"></div>
           <div class="mini-s"><span class="tag tag-green" data-t="s3_tag_match"></span><span data-t="s5_mini_rating"></span><span data-t="s3_dist"></span></div>
         </div>
       </div>
-      <div class="pin" style="left:600px;top:215px"><div class="seat-in" data-at="0.2" data-a="pop"><span class="av big" style="background:#c0784a"><svg viewBox="0 0 64 64"><use href="#i-person"/></svg></span><b data-t="s5_prod"></b></div></div>
-      <div class="pin" style="left:1000px;top:215px"><div class="seat-in" data-at="0.3" data-a="pop"><span class="av big" style="background:#8a63b0"><svg viewBox="0 0 64 64"><use href="#i-person"/></svg></span><b data-t="s5_qa"></b></div></div>
-      <div class="pin" style="left:1265px;top:465px"><div class="seat-in" data-at="0.15" data-a="pop"><span class="av big george"><svg viewBox="30 36 140 140"><use href="#i-george" width="200" height="440"/></svg></span><b data-t="george_name"></b><small data-t="george_role"></small></div></div>
-      <div class="pin" style="left:335px;top:465px"><div class="seat-in" data-at="0.4" data-a="pop"><span class="av big" style="background:#3a8fa3"><svg viewBox="0 0 64 64"><use href="#i-person"/></svg></span><b data-t="s5_proc"></b></div></div>
-      <div class="pin b" style="left:600px;top:150px"><div class="bubble-in" data-at="1.1" data-a="pop" data-t="s5_b_prod"></div></div>
-      <div class="pin b" style="left:1000px;top:150px"><div class="bubble-in" data-at="2.2" data-a="pop" data-t="s5_b_qa"></div></div>
-      <div class="pin b" style="left:335px;top:395px"><div class="bubble-in" data-at="3.2" data-a="pop" data-t="s5_b_proc"></div></div>
-      <div class="pin b" style="left:1265px;top:395px"><div class="bubble-in g" data-at="4.2" data-a="pop" data-t="s5_b_george"></div></div>
+      <div class="pin" data-lp="600,215" data-pp="250,300"><div class="seat-in" data-at="0.2" data-a="pop"><span class="av big" style="background:#c0784a"><svg viewBox="0 0 64 64"><use href="#i-person"/></svg></span><b data-t="s5_prod"></b></div></div>
+      <div class="pin" data-lp="1000,215" data-pp="650,300"><div class="seat-in" data-at="0.3" data-a="pop"><span class="av big" style="background:#8a63b0"><svg viewBox="0 0 64 64"><use href="#i-person"/></svg></span><b data-t="s5_qa"></b></div></div>
+      <div class="pin" data-lp="1265,465" data-pp="660,1060"><div class="seat-in" data-at="0.15" data-a="pop"><span class="av big george"><svg viewBox="30 36 140 140"><use href="#i-george" width="200" height="440"/></svg></span><b data-t="george_name"></b><small data-t="george_role"></small></div></div>
+      <div class="pin" data-lp="335,465" data-pp="240,1060"><div class="seat-in" data-at="0.4" data-a="pop"><span class="av big" style="background:#3a8fa3"><svg viewBox="0 0 64 64"><use href="#i-person"/></svg></span><b data-t="s5_proc"></b></div></div>
+      <div class="pin b" data-lp="600,150" data-pp="250,222"><div class="bubble-in" data-at="1.1" data-a="pop" data-t="s5_b_prod"></div></div>
+      <div class="pin b" data-lp="1000,150" data-pp="650,222"><div class="bubble-in" data-at="2.2" data-a="pop" data-t="s5_b_qa"></div></div>
+      <div class="pin b alt" data-lp="335,395" data-pp="240,1180"><div class="bubble-in" data-at="3.2" data-a="pop" data-t="s5_b_proc"></div></div>
+      <div class="pin b alt" data-lp="1265,395" data-pp="660,1180"><div class="bubble-in g" data-at="4.2" data-a="pop" data-t="s5_b_george"></div></div>
     </div>
   </section>
 
@@ -831,26 +1000,26 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
   <section class="view" id="v-road">
     <div class="fill" data-scene="s6">
       <svg class="full" viewBox="0 0 1600 900">
-        <path d="M0 660 C 300 610, 520 670, 800 650 S 1300 615, 1600 660 V900 H0Z" fill="#e3efe7"/>
-        <g data-at="0.05"><use href="#i-factory" x="180" y="440" width="250" height="208" style="--fc:var(--supplier)"/></g>
-        <g data-at="0.2"><use href="#i-factory" x="1170" y="440" width="250" height="208" style="--fc:var(--george)"/></g>
+        <path id="s6hills" d="M0 660 C 300 610, 520 670, 800 650 S 1300 615, 1600 660 V900 H0Z" fill="#e3efe7"/>
+        <g data-at="0.05"><use id="s6sup" href="#i-factory" x="180" y="440" width="250" height="208" style="--fc:var(--supplier)"/></g>
+        <g data-at="0.2"><use id="s6geo" href="#i-factory" x="1170" y="440" width="250" height="208" style="--fc:var(--george)"/></g>
         <path id="roadPath" class="route" d="M450 642 C 600 642, 640 600, 762 608 S 930 642, 1075 642" data-at="0.3"/>
         <g id="truck" opacity="0">
           <use href="#i-truck" x="-70" y="-77" width="140" height="78"/>
           <text x="-25" y="-37" text-anchor="middle" fill="#fff" font-size="17" font-weight="800" font-family="Heebo,Arial" data-t="s6_sample"></text>
         </g>
       </svg>
-      <div class="pin" style="left:305px;top:700px"><div class="road-lbl" data-at="0.3" data-a="up" data-t="s6_sup"></div></div>
-      <div class="pin" style="left:1295px;top:700px"><div class="road-lbl" data-at="0.4" data-a="up" data-t="s6_george"></div></div>
-      <div class="pin" style="left:768px;top:560px"><div class="dist-chip" data-at="0.6" data-a="scale" data-t="s6_dist"></div></div>
-      <div class="pin b" style="left:1236px;top:660px"><div class="crate" id="crate"><span data-t="s6_sample"></span></div></div>
+      <div class="pin" data-lp="305,700" data-pp="145,812"><div class="road-lbl" data-at="0.3" data-a="up" data-t="s6_sup"></div></div>
+      <div class="pin" data-lp="1295,700" data-pp="755,812"><div class="road-lbl" data-at="0.4" data-a="up" data-t="s6_george"></div></div>
+      <div class="pin" data-lp="768,560" data-pp="430,660"><div class="dist-chip" data-at="0.6" data-a="scale" data-t="s6_dist"></div></div>
+      <div class="pin b" data-lp="1236,660" data-pp="722,772"><div class="crate" id="crate"><span data-t="s6_sample"></span></div></div>
     </div>
   </section>
 
   <!-- ===== Scene 7 · test ===== -->
   <section class="view" id="v-lab">
     <div class="fill" data-scene="s7">
-      <div class="pin" style="left:320px;top:400px">
+      <div class="pin" data-lp="320,400" data-pp="230,430">
         <div class="lab-col" data-at="0.15" data-a="up">
           <svg viewBox="0 0 120 290" width="130" height="314">
             <g clip-path="url(#tubeClip)">
@@ -869,7 +1038,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
           <div class="lab-lbl" data-t="s7_tube"></div>
         </div>
       </div>
-      <div class="pin" style="left:635px;top:420px">
+      <div class="pin" data-lp="635,420" data-pp="670,450">
         <div class="lab-col" data-at="1.0" data-a="up">
           <svg viewBox="0 0 300 190" width="290" height="184">
             <path d="M30 165A120 120 0 0 1 270 165" fill="none" stroke="#e5ece8" stroke-width="26" stroke-linecap="round"/>
@@ -881,7 +1050,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
           <div class="lab-lbl" data-t="s7_gauge"></div>
         </div>
       </div>
-      <div class="pin" style="left:960px;top:400px">
+      <div class="pin" data-lp="960,400" data-pp="230,930">
         <div class="lab-col">
           <div class="okc" data-at="3.6" data-a="pop">
             <svg viewBox="0 0 220 220" width="190" height="190"><path id="okPath" d="M62 116L96 150L162 80" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>
@@ -889,7 +1058,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
           <div class="ok-lbl" data-at="4.1" data-a="up" data-t="s7_ok"></div>
         </div>
       </div>
-      <div class="pin" style="left:1280px;top:410px">
+      <div class="pin" data-lp="1280,410" data-pp="670,935">
         <div class="lab-col">
           <div class="coin" data-at="4.7" data-a="pop"><span>₪</span></div>
           <div class="coin-val" data-at="5.0" data-a="up" data-t="s7_coin_val"></div>
@@ -906,13 +1075,13 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
         <line id="dl1" class="dline" x1="475" y1="400" x2="720" y2="400" pathLength="1"/>
         <line id="dl2" class="dline" x1="1125" y1="400" x2="880" y2="400" pathLength="1"/>
       </svg>
-      <div class="pin" style="left:330px;top:445px">
+      <div class="pin" data-lp="330,445" data-pp="190,640">
         <div class="dfac" data-at="0.1" data-a="fromL"><svg viewBox="0 0 120 100"><use href="#i-factory" style="--fc:var(--supplier)"/></svg><b data-t="s8_sup"></b><small data-t="s8_sup_sub"></small></div>
       </div>
-      <div class="pin" style="left:1270px;top:445px">
+      <div class="pin" data-lp="1270,445" data-pp="710,640">
         <div class="dfac" data-at="0.25" data-a="fromR"><svg viewBox="0 0 120 100"><use href="#i-factory" style="--fc:var(--george)"/></svg><div class="dname"><span class="av george md"><svg viewBox="30 36 140 140"><use href="#i-george" width="200" height="440"/></svg></span><b data-t="george_name"></b></div><small data-t="s8_george_sub"></small></div>
       </div>
-      <div class="pin" style="left:800px;top:400px"><div class="hs" data-at="1.8" data-a="pop">🤝</div></div>
+      <div class="pin" data-lp="800,400" data-pp="450,600"><div class="hs" data-at="1.8" data-a="pop">🤝</div></div>
       <div class="confetti" id="confetti" data-on="2.0"></div>
     </div>
   </section>
@@ -924,7 +1093,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
         <g id="loopLines"></g>
         <g id="dots"></g>
       </svg>
-      <div class="pin" style="left:800px;top:650px"><div class="deal-node" data-at="0.1" data-a="scale"><div class="dn">🤝</div><small data-t="s9_deal"></small></div></div>
+      <div class="pin" data-lp="800,650" data-pp="450,1010"><div class="deal-node" data-at="0.1" data-a="scale"><div class="dn">🤝</div><small data-t="s9_deal"></small></div></div>
       <div class="logo-node" id="logoNode">
         <div class="logo-glow" id="logoGlow"></div>
         <div class="logo-core" data-at="0.15" data-a="pop"><svg viewBox="0 0 64 64"><use href="#i-logo"/></svg></div>
@@ -938,30 +1107,30 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
   <section class="view" id="v-trucks">
     <div class="fill" data-scene="s10">
       <svg class="full" viewBox="0 0 1600 900">
-        <path d="M0 640 C 300 600, 520 650, 800 630 S 1300 600, 1600 640 V900 H0Z" fill="#e3efe7"/>
+        <path id="s10hills" d="M0 640 C 300 600, 520 650, 800 630 S 1300 600, 1600 640 V900 H0Z" fill="#e3efe7"/>
         <g data-at="0.1">
-          <path class="road road-off" d="M740 590 C 900 590, 980 740, 1210 750"/>
-          <path class="road-dash" d="M740 590 C 900 590, 980 740, 1210 750" opacity=".6"/>
+          <path id="s10off1" class="road road-off" d="M740 590 C 900 590, 980 740, 1210 750"/>
+          <path id="s10off2" class="road-dash" d="M740 590 C 900 590, 980 740, 1210 750" opacity=".6"/>
         </g>
-        <g data-at="0.25" opacity=".85">
+        <g data-at="0.25" opacity=".85"><g id="s10lf">
           <path d="M1205 772 Q1240 700 1290 708 Q1325 662 1372 696 Q1418 684 1485 772Z" fill="#bfae95"/>
           <path d="M1250 742l16-9 6 12z" fill="#8f7f6a"/><rect x="1320" y="700" width="16" height="10" rx="2" fill="#9aa5a0" transform="rotate(-18 1328 705)"/>
           <rect x="1392" y="722" width="20" height="9" rx="2" fill="#8f7f6a" transform="rotate(14 1402 726)"/><circle cx="1290" cy="728" r="6" fill="#a8b2ad"/><path d="M1430 752l14-10 4 12z" fill="#9aa5a0"/>
           <g transform="translate(1345 616)"><circle r="34" fill="#ffffff" stroke="#d35454" stroke-width="8"/><path d="M-22 22L22 -22" stroke="#d35454" stroke-width="8" stroke-linecap="round"/></g>
-        </g>
-        <g data-at="0.35"><g transform="translate(869 623) rotate(28)"><rect x="-40" y="-9" width="80" height="18" rx="4" fill="url(#stripes)" stroke="#b84141" stroke-width="2"/><rect x="-34" y="9" width="5" height="22" fill="#6b7479"/><rect x="29" y="9" width="5" height="22" fill="#6b7479"/></g></g>
+        </g></g>
+        <g data-at="0.35"><g id="s10bar" transform="translate(869 623) rotate(28)"><rect x="-40" y="-9" width="80" height="18" rx="4" fill="url(#stripes)" stroke="#b84141" stroke-width="2"/><rect x="-34" y="9" width="5" height="22" fill="#6b7479"/><rect x="29" y="9" width="5" height="22" fill="#6b7479"/></g></g>
         <g data-at="0.05">
           <path id="convoyPath" class="road" d="M360 590 L740 590 C 900 590, 960 400, 1225 400"/>
-          <path class="road-dash" d="M360 590 L740 590 C 900 590, 960 400, 1225 400"/>
+          <path id="s10dash" class="road-dash" d="M360 590 L740 590 C 900 590, 960 400, 1225 400"/>
         </g>
-        <g data-at="0.15"><use href="#i-factory" x="120" y="398" width="240" height="200" style="--fc:var(--supplier)"/></g>
-        <g data-at="0.25"><use href="#i-factory" x="1225" y="210" width="240" height="200" style="--fc:var(--george)"/></g>
+        <g data-at="0.15"><use id="s10sup" href="#i-factory" x="120" y="398" width="240" height="200" style="--fc:var(--supplier)"/></g>
+        <g data-at="0.25"><use id="s10geo" href="#i-factory" x="1225" y="210" width="240" height="200" style="--fc:var(--george)"/></g>
         <g id="convoy"></g>
       </svg>
-      <div class="pin" style="left:240px;top:640px"><div class="road-lbl" data-at="0.3" data-a="up" data-t="s10_sup"></div></div>
-      <div class="pin" style="left:1345px;top:448px"><div class="road-lbl" data-at="0.4" data-a="up" data-t="s10_george"></div></div>
-      <div class="pin" style="left:1345px;top:805px"><div class="lf-lbl" data-at="0.5" data-a="up" data-t="s10_landfill"></div></div>
-      <div class="pin" style="left:760px;top:190px">
+      <div class="pin" data-lp="240,640" data-pp="150,905"><div class="road-lbl" data-at="0.3" data-a="up" data-t="s10_sup"></div></div>
+      <div class="pin" data-lp="1345,448" data-pp="740,678"><div class="road-lbl" data-at="0.4" data-a="up" data-t="s10_george"></div></div>
+      <div class="pin" data-lp="1345,805" data-pp="760,1150"><div class="lf-lbl" data-at="0.5" data-a="up" data-t="s10_landfill"></div></div>
+      <div class="pin" data-lp="760,190" data-pp="450,250">
         <div data-at="0.3" data-a="up">
           <div class="tons" id="tons"><b id="tonsNum">0</b><span data-t="s10_unit"></span></div>
           <div class="tons-sub" data-t="s10_sub"></div>
@@ -1092,18 +1261,20 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
   }
 
   /* ---------- build: loop (scene 9) ---------- */
-  const LC = { x: 800, y: 350 };
+  let LC = { x: 800, y: 350 }, orbPos = [];
   const ORB_ANG = [180, 215, 270, 325, 0, 145, 35];
   const ORB_COL = ["#5b7db1", "#7b8a96", "#3a8fa3", "#8a63b0", "#c0784a", "#4f7cac", "#6b8f71"];
   const TARGET = 3;
   const orbsEl = $("#orbs"), linesEl = $("#loopLines");
-  const orbPos = ORB_ANG.map(a => ({ x: LC.x + 400 * Math.cos(a * Math.PI / 180), y: LC.y + 235 * Math.sin(a * Math.PI / 180) }));
-  orbPos.forEach((p, i) => {
+  const orbPins = [], orbLines = [];
+  ORB_ANG.forEach((ang, i) => {
     const at = (2.2 + i * .16).toFixed(2);
-    linesEl.insertAdjacentHTML("beforeend", `<line class="lline" x1="${LC.x}" y1="${LC.y}" x2="${p.x.toFixed(0)}" y2="${p.y.toFixed(0)}" data-at="${at}"/>`);
+    linesEl.insertAdjacentHTML("beforeend", `<line class="lline" data-at="${at}"/>`);
+    orbLines.push(linesEl.lastElementChild);
     const extra = i === TARGET ? `<div class="orb-ring" data-on="5.3"></div><div class="newb" data-at="5.35" data-a="pop" data-t="s9_new"></div>` : "";
     orbsEl.insertAdjacentHTML("beforeend",
-      `<div class="pin" style="left:${p.x.toFixed(0)}px;top:${p.y.toFixed(0)}px"><div class="orb-in" data-at="${at}" data-a="pop">${extra}<svg viewBox="0 0 120 100"><use href="#i-factory" style="--fc:${ORB_COL[i]}"/></svg></div></div>`);
+      `<div class="pin"><div class="orb-in" data-at="${at}" data-a="pop">${extra}<svg viewBox="0 0 120 100"><use href="#i-factory" style="--fc:${ORB_COL[i]}"/></svg></div></div>`);
+    orbPins.push(orbsEl.lastElementChild);
   });
   const dotsEl = $("#dots"), NDOTS = REDUCED ? 6 : 16, dots = [];
   for (let i = 0; i < NDOTS; i++) {
@@ -1144,13 +1315,13 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
 
   /* ---------- per-frame animations (driven by time, so pause/seek stay exact) ---------- */
   const georgeS1 = $("#georgeS1");
-  const convoyPath = $("#convoyPath"), convoyLen = convoyPath.getTotalLength(), tonsNum = $("#tonsNum"), tonsEl = $("#tons");
+  const convoyPath = $("#convoyPath"); let convoyLen = 0; const tonsNum = $("#tonsNum"), tonsEl = $("#tons");
   const phoneWrap = $("#phoneWrap"), notif = $("#notif"), finger2 = $("#finger2");
   const finger3 = $("#finger3"), cta = $("#cta"), rnum = $("#rnum"), cbar = $("#cbar");
   const ringProg = $("#ringProg"), ringNum = $("#ringNum"), roiNum = $("#roiNum");
   const crate = $("#crate");
   const bounce = x => { const n = 7.5625, d = 2.75; if (x < 1 / d) return n * x * x; if (x < 2 / d) return n * (x -= 1.5 / d) * x + .75; if (x < 2.5 / d) return n * (x -= 2.25 / d) * x + .9375; return n * (x -= 2.625 / d) * x + .984375; };
-  const truck = $("#truck"), road = $("#roadPath"), roadLen = road.getTotalLength();
+  const truck = $("#truck"), road = $("#roadPath"); let roadLen = 0;
   const liquid = $("#liquid"), bubbles = $("#bubbles"), gaugeProg = $("#gaugeProg"), needle = $("#needle"), gNum = $("#gNum"), okPath = $("#okPath");
   const dl1 = $("#dl1"), dl2 = $("#dl2");
   const logoNode = $("#logoNode"), logoGlow = $("#logoGlow"), fly = $("#fly");
@@ -1161,7 +1332,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
     const m = eout(seg(lt, t0, tTap));
     const press = lt > tTap && lt < tTap + .35 ? Math.sin(seg(lt, tTap, tTap + .35) * Math.PI) : 0;
     el.style.opacity = show;
-    el.style.left = (tx - 30) + "px"; el.style.top = (ty - 6) + "px";
+    el.style.left = (tx - el.offsetWidth * .47) + "px"; el.style.top = (ty - el.offsetHeight * .08) + "px";
     el.style.transform = `translate(${(1 - m) * fromDx}px,${(1 - m) * fromDy}px) scale(${1 - .14 * press})`;
     return press;
   }
@@ -1170,13 +1341,14 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
     s2(lt) {
       const press = fingerAt(finger2, lt, 200, 300, .3, 1.3, 1.75, 90, 380);
       notif.style.transform = press > 0 ? `scale(${1 - .035 * press})` : "";
-      if (lt <= 0) { phoneWrap.style.transform = ""; phoneWrap.style.opacity = ""; georgeS1.style.opacity = ""; return; }
+      if (lt <= 0) { phoneWrap.style.transform = `scale(${G.phone})`; phoneWrap.style.opacity = ""; georgeS1.style.opacity = ""; return; }
       georgeS1.style.opacity = 1 - seg(lt, 1.8, 2.4);
       const z = eio(seg(lt, 2.0, 3.5));
-      phoneWrap.style.transform = `scale(${1 + (REDUCED ? .12 : 2.6) * z})`;
+      phoneWrap.style.transform = `scale(${G.phone * (1 + (REDUCED ? .12 : 2.6) * z)})`;
       phoneWrap.style.opacity = 1 - seg(lt, 2.5, 3.5);
     },
     s3(lt) {
+      p1in.style.transform = G.portrait ? `translateY(${-scrollAt(lt, SCROLL.p1).toFixed(1)}px)` : "";
       const t0 = 2.6, step = .2;
       starFills.forEach((f, i) => {
         const full = clamp(DATA.rating - i);
@@ -1197,6 +1369,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
       cta.style.transform = press > 0 ? `scale(${1 - .05 * press})` : "";
     },
     s4(lt) {
+      p2in.style.transform = G.portrait ? `translateY(${-scrollAt(lt, SCROLL.p2).toFixed(1)}px)` : "";
       const v = DATA.match * eout(seg(lt, .6, 2.8));
       ringProg.setAttribute("stroke-dashoffset", (628.32 * (1 - v / 100)).toFixed(2));
       ringNum.textContent = Math.round(v) + "%";
@@ -1245,7 +1418,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
         bump = Math.max(bump, Math.sin(seg(lt, arr - .05, arr + .3) * Math.PI));
         const pl = pluses[i];
         pl.style.opacity = (f > 0 && f < 1) ? Math.sin(f * Math.PI).toFixed(2) : 0;
-        pl.style.transform = `translate(${1345 + ((i % 3) - 1) * 26}px,${(190 - 70 * f).toFixed(1)}px) translate(-50%,-50%)`;
+        pl.style.transform = `translate(${G.plus.x + ((i % 3) - 1) * 26}px,${(G.plus.y - 70 * f).toFixed(1)}px) translate(-50%,-50%)`;
       });
       tonsNum.textContent = Math.round(tons);
       tonsEl.style.transform = REDUCED ? "" : `scale(${(1 + .06 * bump).toFixed(3)})`;
@@ -1255,8 +1428,8 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
       dots.forEach((d, i) => {
         const st = .4 + i * (REDUCED ? .5 : .2), p = (lt - st) / 1.1;
         if (p <= 0 || p >= 1) { d.setAttribute("opacity", 0); return; }
-        const x = 800 + Math.sin(p * Math.PI * 2 + i * 1.7) * 30 * (1 - p);
-        const y = lerp(605, 455, eio(p));
+        const x = LC.x + Math.sin(p * Math.PI * 2 + i * 1.7) * 30 * (1 - p);
+        const y = lerp(G.loop.d0, G.loop.d1, eio(p));
         d.setAttribute("cx", x.toFixed(1)); d.setAttribute("cy", y.toFixed(1));
         d.setAttribute("opacity", (Math.min(1, p * 5) * Math.min(1, (1 - p) * 4)).toFixed(2));
       });
@@ -1265,7 +1438,8 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
       logoGlow.style.opacity = g;
       logoGlow.style.transform = `scale(${.8 + .4 * g})`;
       // next notification flies out to another factory
-      const tp = orbPos[TARGET], f = eio(seg(lt, 4.4, 5.3));
+      const tp0 = orbPos[TARGET], f = eio(seg(lt, 4.4, 5.3)), half = fly.offsetWidth / 2 + 16;
+      const tp = { x: clamp(tp0.x, half, G.W - half), y: tp0.y };
       const op = seg(lt, 4.2, 4.45) * (1 - seg(lt, 5.35, 5.7));
       fly.style.opacity = op;
       fly.style.transform = `translate(${lerp(LC.x, tp.x, f)}px,${lerp(LC.y, tp.y - 10, f)}px) translate(-50%,-50%) scale(${.6 + .4 * seg(lt, 4.2, 4.6)})`;
@@ -1421,6 +1595,98 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
     return out;
   };
 
+  /* ---------- layouts: landscape (16:9) and portrait for phones (9:15) ---------- */
+  const GEO = {
+    landscape: {
+      W: 1600, H: 900, PH: 976, phone: 1, portrait: false,
+      loop: { cx: 800, cy: 350, rx: 400, ry: 235, d0: 605, d1: 455 },
+      plus: { x: 1345, y: 190 },
+      attrs: {
+        "#s6hills": { d: "M0 660 C 300 610, 520 670, 800 650 S 1300 615, 1600 660 V900 H0Z" },
+        "#s6sup": { x: 180, y: 440, width: 250, height: 208 },
+        "#s6geo": { x: 1170, y: 440, width: 250, height: 208 },
+        "#roadPath": { d: "M450 642 C 600 642, 640 600, 762 608 S 930 642, 1075 642" },
+        "#dl1": { x1: 475, y1: 400, x2: 720, y2: 400 },
+        "#dl2": { x1: 1125, y1: 400, x2: 880, y2: 400 },
+        "#s10hills": { d: "M0 640 C 300 600, 520 650, 800 630 S 1300 600, 1600 640 V900 H0Z" },
+        "#s10off1, #s10off2": { d: "M740 590 C 900 590, 980 740, 1210 750" },
+        "#s10lf": { transform: "translate(0 0)" },
+        "#s10bar": { transform: "translate(869 623) rotate(28)" },
+        "#convoyPath, #s10dash": { d: "M360 590 L740 590 C 900 590, 960 400, 1225 400" },
+        "#s10sup": { x: 120, y: 398, width: 240, height: 200 },
+        "#s10geo": { x: 1225, y: 210, width: 240, height: 200 }
+      }
+    },
+    portrait: {
+      W: 900, H: 1500, PH: 1690, phone: 1.45, portrait: true,
+      loop: { cx: 450, cy: 560, rx: 330, ry: 380, d0: 965, d1: 675 },
+      plus: { x: 740, y: 400 },
+      attrs: {
+        "#s6hills": { d: "M0 770 C 200 740, 330 790, 450 775 S 700 745, 900 770 V1500 H0Z" },
+        "#s6sup": { x: 20, y: 560, width: 250, height: 208 },
+        "#s6geo": { x: 630, y: 560, width: 250, height: 208 },
+        "#roadPath": { d: "M262 758 C 340 758, 370 718, 430 722 S 520 758, 590 758" },
+        "#dl1": { x1: 300, y1: 600, x2: 370, y2: 600 },
+        "#dl2": { x1: 600, y1: 600, x2: 530, y2: 600 },
+        "#s10hills": { d: "M0 860 C 200 830, 330 880, 450 865 S 700 835, 900 860 V1500 H0Z" },
+        "#s10off1, #s10off2": { d: "M410 848 C 520 848, 560 1010, 690 1040" },
+        "#s10lf": { transform: "translate(-585 338)" },
+        "#s10bar": { transform: "translate(494 884) rotate(35)" },
+        "#convoyPath, #s10dash": { d: "M268 848 L410 848 C 540 848, 520 628, 640 628" },
+        "#s10sup": { x: 25, y: 650, width: 250, height: 208 },
+        "#s10geo": { x: 615, y: 430, width: 250, height: 208 }
+      }
+    }
+  };
+  let G = GEO.landscape, MODE = null;
+  const p1in = $("#p1in"), p2in = $("#p2in");
+  const SCROLL = { p1: [], p2: [] };
+  // auto-scroll for the portrait app: at each time, scroll so that the element is fully visible
+  function computeScroll() {
+    if (!G.portrait) return;
+    const target = (inner, el) => {
+      const viewH = inner.parentElement.clientHeight, max = inner.offsetTop + inner.offsetHeight + 14 - viewH;
+      return clamp(inner.offsetTop + el.offsetTop + el.offsetHeight + 14 - viewH, 0, Math.max(0, max));
+    };
+    SCROLL.p1 = [[5.0, $(".mapcard")], [8.2, $(".doccard")], [10.5, $(".cta-row")]].map(([tm, el]) => [tm, target(p1in, el)]);
+    SCROLL.p2 = [[2.6, $(".actions")], [4.7, $(".roi")]].map(([tm, el]) => [tm, target(p2in, el)]);
+  }
+  function scrollAt(lt, steps) {
+    let y = 0;
+    for (const [tm, to] of steps) y = lerp(y, to, eio(seg(lt, tm, tm + .8)));
+    return y;
+  }
+  function applyLayout() {
+    const mode = innerWidth < innerHeight * .95 ? "portrait" : "landscape";
+    if (mode === MODE) return false;
+    MODE = mode; G = GEO[mode];
+    document.body.classList.toggle("portrait", G.portrait);
+    const rs = document.documentElement.style;
+    rs.setProperty("--W", G.W + "px"); rs.setProperty("--H", G.H + "px");
+    rs.setProperty("--PW", G.W + "px"); rs.setProperty("--PH", G.PH + "px");
+    $$("[data-lp]").forEach(el => {
+      const v = (G.portrait ? el.dataset.pp : el.dataset.lp).split(",");
+      el.style.left = v[0] + "px"; el.style.top = v[1] + "px";
+      if (v[2]) el.style.width = v[2] + "px";
+    });
+    $$("svg.full").forEach(sv => sv.setAttribute("viewBox", `0 0 ${G.W} ${G.H}`));
+    for (const sel in G.attrs) $$(sel).forEach(el => { for (const k in G.attrs[sel]) el.setAttribute(k, G.attrs[sel][k]); });
+    roadLen = road.getTotalLength(); convoyLen = convoyPath.getTotalLength();
+    const L = G.loop;
+    LC = { x: L.cx, y: L.cy };
+    logoNode.style.left = L.cx + "px"; logoNode.style.top = L.cy + "px";
+    orbPos = ORB_ANG.map(a => ({ x: L.cx + L.rx * Math.cos(a * Math.PI / 180), y: L.cy + L.ry * Math.sin(a * Math.PI / 180) }));
+    orbPos.forEach((p, i) => {
+      orbPins[i].style.left = p.x.toFixed(0) + "px"; orbPins[i].style.top = p.y.toFixed(0) + "px";
+      const ln = orbLines[i];
+      ln.setAttribute("x1", L.cx); ln.setAttribute("y1", L.cy); ln.setAttribute("x2", p.x.toFixed(0)); ln.setAttribute("y2", p.y.toFixed(0));
+    });
+    computeScroll();
+    fit();
+    return true;
+  }
+  applyLayout();
+
   /* ---------- render ---------- */
   const barFill = $("#barFill"), timeEl = $("#time");
   const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
@@ -1474,6 +1740,7 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
   }
   btnPlay.addEventListener("click", () => { if (!playing && t >= DURATION) restart(); else setPlaying(!playing); });
   $("#btnRestart").addEventListener("click", restart);
+  stage.addEventListener("click", () => btnPlay.click());
   $("#bar").addEventListener("click", e => {
     const r = e.currentTarget.getBoundingClientRect();
     seek((r.right - e.clientX) / r.width * DURATION); // RTL: fills from the right
@@ -1483,9 +1750,11 @@ svg.full{position:absolute;inset:0;width:1600px;height:900px;overflow:visible}
     else if (e.key === "r" || e.key === "R" || e.key === "ר") restart();
   });
 
-  /* ---------- fit 16:9 to window ---------- */
-  function fit() { player.style.setProperty("--s", Math.min(innerWidth / 1600, innerHeight / 976) * .97); }
-  addEventListener("resize", fit); fit();
+  /* ---------- fit to window ---------- */
+  function fit() { player.style.setProperty("--s", Math.min(innerWidth / G.W, innerHeight / G.PH) * .98); }
+  addEventListener("resize", () => { if (applyLayout()) seek(t); else fit(); });
+  if (window.visualViewport) visualViewport.addEventListener("resize", () => { if (applyLayout()) seek(t); else fit(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { computeScroll(); render(t); });
 
   /* ---------- start ---------- */
   const q = new URLSearchParams(location.search);
