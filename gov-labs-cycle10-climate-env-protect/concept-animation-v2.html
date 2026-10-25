@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הדגמת קונספט — בקרת נתוני ניטור אוויר</title>
+<style>
+  :root{
+    --bg:#F6F5F1; --ink:#1F2A2E; --muted:#5E6B68; --accent:#1F6F68; --accent-soft:#D7E9E6;
+    --amber:#C9821F; --amber-soft:#F6E6CC; --gray:#A7B0AE; --frame:#3A4744; --panel:#FFFFFF;
+    --font:"Assistant","Rubik","Heebo","Arial Hebrew",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:#E9E7E1;color:var(--ink);font-family:var(--font);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:8px}
+  #frame{position:relative;width:min(100vw - 16px, (100vh - 96px) * 16 / 9);aspect-ratio:16/9;overflow:hidden;border-radius:12px;background:var(--bg);box-shadow:0 10px 30px rgba(31,42,46,.12)}
+  #stage{position:absolute;top:0;right:0;width:1600px;height:900px;transform-origin:top right}
+  #art{position:absolute;inset:0;width:1600px;height:900px}
+  .cap{position:absolute;top:40px;left:290px;right:290px;text-align:center;font-size:64px;font-weight:700;line-height:1.2;color:var(--ink);opacity:0;will-change:opacity,transform}
+  .chip{position:absolute;top:44px;right:40px;font-size:38px;font-weight:700;color:var(--accent);background:var(--panel);border-radius:999px;padding:6px 24px;box-shadow:0 2px 8px rgba(31,42,46,.08);direction:ltr}
+  .tag{position:absolute;top:50px;left:40px;font-size:26px;font-weight:600;color:var(--muted);background:rgba(255,255,255,.75);border-radius:999px;padding:6px 18px}
+  .legend{position:absolute;top:676px;left:450px;width:500px;display:flex;justify-content:center;gap:30px;font-size:36px;font-weight:700;color:var(--ink);background:rgba(255,255,255,.85);border-radius:999px;padding:8px 26px;opacity:0;box-shadow:0 2px 8px rgba(31,42,46,.08)}
+  .legend span{display:flex;align-items:center;gap:10px;white-space:nowrap}
+  .legend i{width:22px;height:22px;border-radius:50%;display:inline-block;flex:none}
+  .bubble{position:absolute;font-size:52px;font-weight:700;line-height:1.25;padding:22px 34px;border-radius:30px;opacity:0;will-change:opacity,transform;box-shadow:0 6px 18px rgba(31,42,46,.12)}
+  #bTech{background:var(--panel);color:var(--ink);border:3px solid var(--gray);top:430px;right:210px}
+  #bSvc{background:var(--accent);color:#fff;top:470px;left:200px;right:330px;text-align:center}
+  .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;background:rgba(246,245,241,.94);text-align:center;padding:40px}
+  .overlay[hidden]{display:none}
+  .overlay h1{font-size:64px;margin:0;font-weight:700}
+  .overlay p{font-size:34px;margin:0;color:var(--muted)}
+  .overlay p.lead{font-size:44px;color:var(--ink);font-weight:600}
+  .big{font-family:var(--font);font-size:40px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:999px;padding:22px 64px;cursor:pointer;min-height:44px}
+  .big:focus-visible,#controls button:focus-visible,#seek:focus-visible{outline:4px solid var(--amber);outline-offset:3px}
+  #controls{width:min(100vw - 16px, (100vh - 96px) * 16 / 9);display:flex;align-items:center;gap:10px;direction:rtl}
+  #controls button{width:44px;height:44px;border-radius:50%;border:0;background:var(--ink);color:#fff;font-size:18px;cursor:pointer;flex:none;display:grid;place-items:center}
+  #seek{flex:1;accent-color:var(--accent);height:44px;min-width:0;direction:ltr}
+  #time{font-size:15px;color:var(--muted);flex:none;direction:ltr;font-variant-numeric:tabular-nums;min-width:86px;text-align:center}
+</style>
+</head>
+<body>
+<div id="frame" role="region" aria-label="סרטון הדגמת קונספט">
+  <div id="stage">
+    <svg id="art" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#1F2A2E" flood-opacity=".12"/></filter>
+      </defs>
+      <rect width="1600" height="900" fill="#F6F5F1"/>
+      <rect id="night" width="1600" height="900" fill="#22324A" opacity="0"/>
+
+      <!-- gate: the continuous check band, next to the coordinator's screen -->
+      <g id="gate" opacity="0">
+        <rect x="1076" y="340" width="48" height="230" rx="24" fill="#D7E9E6"/>
+        <rect x="1096" y="352" width="8" height="206" rx="4" fill="#1F6F68" opacity=".55"/>
+        <text x="1100" y="322" font-size="34" font-weight="700" fill="#1F6F68" text-anchor="middle" font-family="Assistant,Rubik,Heebo,Arial">בדיקה רציפה</text>
+      </g>
+
+      <!-- data paths (faint) -->
+      <g id="paths" fill="none" stroke="#C9CFCD" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round">
+        <polyline id="p0" points="1400,320 1150,370 945,385"/>
+        <polyline id="p1" points="1395,475 1150,445 945,435"/>
+        <polyline id="p2" points="1440,630 1150,550 945,485"/>
+        <polyline id="p3" points="1290,275 1150,365 945,380"/>
+        <polyline id="p4" points="1535,500 1500,545 1150,505 945,460"/>
+      </g>
+
+      <!-- sources: a stack (top), two stations, and two smaller sources in the back -->
+      <g id="stations" filter="url(#soft)">
+        <g id="mini3" transform="translate(1290,250) scale(.5)" opacity=".75">
+          <line x1="20" y1="-40" x2="20" y2="0" stroke="#3A4744" stroke-width="6"/>
+          <rect x="0" y="0" width="56" height="88" fill="#2F6DB5"/><rect x="56" y="0" width="54" height="88" fill="#7CC242"/>
+          <path d="M0 88 V70 q14 -16 28 0 q14 -16 28 0 q14 -16 28 0 q14 -16 26 0 V88 Z" fill="#fff"/>
+        </g>
+        <g id="mini4" transform="translate(1535,470) scale(.45)" opacity=".75">
+          <rect x="0" y="0" width="150" height="130" rx="6" fill="#B9C0BE"/>
+          <rect x="96" y="-110" width="30" height="120" fill="#8C9694"/><rect x="92" y="-118" width="38" height="12" rx="3" fill="#6E7876"/>
+        </g>
+        <g id="ch" transform="translate(1400,250)">
+          <rect x="0" y="0" width="150" height="130" rx="6" fill="#B9C0BE"/>
+          <rect x="96" y="-110" width="30" height="120" fill="#8C9694"/><rect x="92" y="-118" width="38" height="12" rx="3" fill="#6E7876"/>
+          <rect x="14" y="20" width="60" height="40" rx="4" fill="#E3E7E6"/>
+          <circle id="sd0" cx="40" cy="-24" r="11" fill="#A7B0AE"/>
+        </g>
+        <g id="st0" transform="translate(1395,430)">
+          <line x1="20" y1="-40" x2="20" y2="0" stroke="#3A4744" stroke-width="4"/><rect x="14" y="-50" width="12" height="14" rx="3" fill="#3A4744"/>
+          <path d="M0 0 H110 M0 -12 H110" stroke="#8C9694" stroke-width="3"/>
+          <rect x="0" y="0" width="56" height="88" fill="#2F6DB5"/><rect x="56" y="0" width="54" height="88" fill="#7CC242"/>
+          <path d="M0 88 V70 q14 -16 28 0 q14 -16 28 0 q14 -16 28 0 q14 -16 26 0 V88 Z" fill="#fff"/>
+          <circle id="sd1" cx="55" cy="-24" r="11" fill="#A7B0AE"/>
+        </g>
+        <g id="st1" transform="translate(1440,590)">
+          <line x1="90" y1="-40" x2="90" y2="0" stroke="#3A4744" stroke-width="4"/><rect x="84" y="-50" width="12" height="14" rx="3" fill="#3A4744"/>
+          <path d="M0 0 H110 M0 -12 H110" stroke="#8C9694" stroke-width="3"/>
+          <rect x="0" y="0" width="54" height="88" fill="#7CC242"/><rect x="54" y="0" width="56" height="88" fill="#2F6DB5"/>
+          <path d="M0 88 V70 q14 -16 28 0 q14 -16 28 0 q14 -16 28 0 q14 -16 26 0 V88 Z" fill="#fff"/>
+          <circle id="sd2" cx="55" cy="-24" r="11" fill="#A7B0AE"/>
+        </g>
+      </g>
+      <rect id="stRing" x="1424" y="526" width="142" height="168" rx="16" fill="none" stroke="#C9821F" stroke-width="5" opacity="0"/>
+
+      <!-- monitor + desk -->
+      <g id="desk">
+        <rect x="390" y="636" width="620" height="20" rx="8" fill="#C9C2B5"/>
+        <rect x="672" y="606" width="56" height="34" fill="#8C9694"/>
+        <rect x="440" y="226" width="520" height="390" rx="18" fill="#3A4744" filter="url(#soft)"/>
+        <rect id="screen" x="458" y="244" width="484" height="354" rx="8" fill="#FFFFFF"/>
+        <g id="gridG"></g>
+        <g id="calmG" opacity="0"></g>
+        <g id="queueG" opacity="0">
+          <text x="900" y="288" font-size="30" font-weight="700" fill="#1F2A2E" text-anchor="start" font-family="Assistant,Rubik,Heebo,Arial">תור בקרה</text>
+          <g id="card0"><rect x="480" y="306" width="440" height="72" rx="12" fill="#F6E6CC"/><circle cx="892" cy="342" r="12" fill="#C9821F"/><text x="866" y="352" font-size="30" font-weight="700" fill="#8A5A12" text-anchor="start" font-family="Assistant,Arial">?</text><rect x="494" y="330" width="14" height="24" fill="#2F6DB5"/><rect x="508" y="330" width="14" height="24" fill="#7CC242"/><rect x="540" y="326" width="280" height="12" rx="6" fill="#D9C39C"/><rect x="570" y="348" width="250" height="10" rx="5" fill="#E6D5B4"/></g>
+          <g id="card1"><rect x="480" y="392" width="440" height="72" rx="12" fill="#F6E6CC"/><circle cx="892" cy="428" r="12" fill="#C9821F"/><polyline points="842,444 856,432 868,437 882,418" fill="none" stroke="#8A5A12" stroke-width="4" stroke-linecap="round"/><rect x="494" y="416" width="14" height="24" fill="#7CC242"/><rect x="508" y="416" width="14" height="24" fill="#2F6DB5"/><rect x="540" y="412" width="270" height="12" rx="6" fill="#D9C39C"/><rect x="570" y="434" width="240" height="10" rx="5" fill="#E6D5B4"/></g>
+          <g id="card2"><rect x="480" y="478" width="440" height="72" rx="12" fill="#F6E6CC"/><circle cx="892" cy="514" r="12" fill="#C9821F"/><rect x="494" y="510" width="30" height="20" rx="3" fill="#8C9694"/><rect x="512" y="490" width="8" height="22" fill="#6E7876"/><rect x="540" y="498" width="290" height="12" rx="6" fill="#D9C39C"/><rect x="570" y="520" width="260" height="10" rx="5" fill="#E6D5B4"/></g>
+          <g id="explain" opacity="0">
+            <rect x="470" y="300" width="460" height="270" rx="14" fill="#FFFFFF" stroke="#C9821F" stroke-width="4"/>
+            <text x="900" y="350" font-size="30" font-weight="700" fill="#1F2A2E" text-anchor="start" font-family="Assistant,Rubik,Heebo,Arial">הסבר למה סומן</text>
+            <rect x="510" y="380" width="380" height="14" rx="7" fill="#E3E7E6"/>
+            <rect x="560" y="414" width="330" height="14" rx="7" fill="#E3E7E6"/>
+            <polyline points="520,530 580,512 640,520 700,490 760,470 820,476 880,440" fill="none" stroke="#C9821F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </g>
+        <g id="approveG" opacity="0">
+          <rect x="480" y="270" width="440" height="200" rx="12" fill="#D7E9E6"/>
+          <rect x="520" y="300" width="360" height="16" rx="8" fill="#9CC8C2"/><rect x="560" y="336" width="320" height="16" rx="8" fill="#9CC8C2"/><rect x="600" y="372" width="280" height="16" rx="8" fill="#9CC8C2"/>
+          <g id="btn"><rect x="560" y="500" width="280" height="70" rx="35" fill="#1F6F68"/><text x="700" y="546" font-size="32" font-weight="700" fill="#fff" text-anchor="middle" font-family="Assistant,Rubik,Heebo,Arial">אישור פרסום</text></g>
+        </g>
+        <rect id="dim" x="458" y="244" width="484" height="354" rx="8" fill="#22324A" opacity="0"/>
+      </g>
+
+      <!-- outflow (scene 7): verified data leaves the coordinator's screen -->
+      <g id="outPaths" opacity="0" fill="none" stroke="#9CC8C2" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round">
+        <polyline id="o0" points="600,330 440,330 335,268"/>
+        <polyline id="o1" points="600,385 430,388 230,388 130,322"/>
+      </g>
+      <g id="outDots"></g>
+
+      <!-- public screen (scene 7) -->
+      <g id="pub" opacity="0" filter="url(#soft)">
+        <rect x="322" y="318" width="26" height="34" fill="#8C9694"/>
+        <rect x="245" y="200" width="180" height="120" rx="12" fill="#FFFFFF" stroke="#3A4744" stroke-width="5"/>
+        <path id="pubWave" d="M268 248 q22 -24 44 0 t44 0 t44 0" pathLength="1" fill="none" stroke="#1F6F68" stroke-width="5" stroke-linecap="round"/>
+        <rect x="268" y="274" width="134" height="10" rx="5" fill="#D7E9E6"/><rect x="292" y="294" width="110" height="10" rx="5" fill="#D7E9E6"/>
+      </g>
+
+      <!-- trend screen (scene 7, no caption): verified data goes on to further use -->
+      <g id="ana" opacity="0" filter="url(#soft)">
+        <rect x="117" y="318" width="26" height="34" fill="#8C9694"/>
+        <rect x="40" y="200" width="180" height="120" rx="12" fill="#FFFFFF" stroke="#3A4744" stroke-width="5"/>
+        <path d="M60 300 H200" stroke="#C9CFCD" stroke-width="3"/>
+        <g id="bars" fill="#9CC8C2"></g>
+        <polyline id="trend" points="70,282 108,262 146,268 186,230" pathLength="1" fill="none" stroke="#1F6F68" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+
+      <!-- the coordinator (persona) -->
+      <g id="ella" transform="translate(190,430)">
+        <path d="M-20 270 q0 -150 110 -150 q110 0 110 150 Z" fill="#23395B"/>
+        <path d="M70 128 l20 30 l20 -30" fill="none" stroke="#1A2B45" stroke-width="5"/>
+        <rect x="74" y="88" width="32" height="40" rx="10" fill="#E7B79A"/>
+        <g fill="#B5562F"><circle cx="62" cy="34" r="30"/><circle cx="118" cy="34" r="30"/><circle cx="90" cy="16" r="32"/><circle cx="52" cy="70" r="24"/><circle cx="128" cy="70" r="24"/><circle cx="58" cy="100" r="18"/><circle cx="122" cy="100" r="18"/></g>
+        <ellipse cx="90" cy="62" rx="36" ry="42" fill="#EBC1A5"/>
+        <g fill="none" stroke="#2B2B2B" stroke-width="3.5"><circle cx="74" cy="60" r="12"/><circle cx="106" cy="60" r="12"/><path d="M86 60 h8"/></g>
+        <path d="M80 86 q10 6 20 0" fill="none" stroke="#9C5B45" stroke-width="3" stroke-linecap="round"/>
+        <g id="ellaArm"><path d="M150 190 q60 -10 90 -40" fill="none" stroke="#23395B" stroke-width="26" stroke-linecap="round"/><circle cx="242" cy="148" r="14" fill="#EBC1A5"/></g>
+      </g>
+
+      <!-- manager (scene 4) -->
+      <g id="mgr" opacity="0" transform="translate(150,440)">
+        <path d="M-20 270 q0 -150 110 -150 q110 0 110 150 Z" fill="#4A5552"/>
+        <path d="M60 128 l30 50 l30 -50" fill="#E6E2DA"/>
+        <rect x="74" y="88" width="32" height="40" rx="10" fill="#D9A788"/>
+        <ellipse cx="90" cy="60" rx="36" ry="42" fill="#E0B092"/>
+        <path d="M54 52 q0 -46 36 -46 q36 0 36 46 q-8 -22 -36 -22 q-28 0 -36 22 Z" fill="#9AA3A1"/>
+        <g id="phone"><rect x="150" y="130" width="44" height="76" rx="9" fill="#1F2A2E"/><rect id="phoneScr" x="156" y="138" width="32" height="56" rx="5" fill="#3A4744"/></g>
+        <circle id="ring" cx="172" cy="168" r="40" fill="none" stroke="#C9821F" stroke-width="5" opacity="0"/>
+      </g>
+      <g id="parties" opacity="0" fill="none" stroke="#1F6F68" stroke-width="5" stroke-linecap="round">
+        <path id="l0" d="M240 470 L110 300"/><path id="l1" d="M250 460 L250 270"/><path id="l2" d="M260 470 L390 300"/>
+        <g fill="#FFFFFF" stroke="#1F6F68" stroke-width="5"><circle cx="110" cy="280" r="32"/><circle cx="250" cy="250" r="32"/><circle cx="390" cy="280" r="32"/></g>
+        <g stroke="#1F6F68" stroke-width="5"><path d="M98 290 l24 -24 m-8 -4 l12 12"/><path d="M236 252 h28 m-14 -14 v28"/><path d="M376 292 h28 v-24 h-28 z"/></g>
+      </g>
+
+      <!-- technician (scene 6), standing by the station with the faulty instrument -->
+      <g id="tech" opacity="0" transform="translate(1250,575) scale(.8)">
+        <path d="M-20 260 q0 -140 100 -140 q100 0 100 140 Z" fill="#5C6B5E"/>
+        <path d="M30 140 v120 M130 140 v120" stroke="#C9821F" stroke-width="10"/>
+        <rect x="64" y="86" width="32" height="40" rx="10" fill="#C99577"/>
+        <ellipse cx="80" cy="58" rx="34" ry="40" fill="#D4A385"/>
+        <path d="M46 46 q0 -42 34 -42 q34 0 34 42 Z" fill="#E3A33A"/>
+        <g id="wrench" transform="translate(150,170)"><path d="M-30 30 L20 -20" stroke="#3A4744" stroke-width="12" stroke-linecap="round"/><circle cx="24" cy="-24" r="14" fill="none" stroke="#3A4744" stroke-width="9"/></g>
+      </g>
+      <g id="ticket" opacity="0"><rect x="-46" y="-30" width="92" height="60" rx="10" fill="#FFFFFF" stroke="#C9821F" stroke-width="5"/><path d="M-26 -8 h52 M-26 10 h36" stroke="#C9821F" stroke-width="6" stroke-linecap="round"/></g>
+
+      <!-- data dots -->
+      <g id="dots"></g>
+      <g id="alarm" opacity="0"><circle id="alarmRing" r="30" fill="none" stroke="#C9821F" stroke-width="6"/><circle id="alarmDot" r="16" fill="#C9821F"/></g>
+
+      <!-- 24h strip(s) -->
+      <g id="stripToday" transform="translate(0,0)">
+        <rect x="150" y="806" width="1300" height="18" rx="9" fill="#E3E7E6"/>
+        <rect id="tGap" x="150" y="806" width="0" height="18" rx="9" fill="#A7B0AE" opacity="0"/>
+        <circle id="tCheck" cx="0" cy="815" r="16" fill="#1F2A2E" opacity="0"/>
+        <text id="tTomorrow" x="150" y="790" font-size="28" font-weight="700" fill="#5E6B68" text-anchor="start" opacity="0" font-family="Assistant,Rubik,Heebo,Arial">מחר</text>
+      </g>
+      <g id="stripSvc" opacity="0">
+        <rect x="150" y="806" width="1300" height="18" rx="9" fill="#E3E7E6"/>
+        <rect id="sFill" x="1450" y="806" width="0" height="18" rx="9" fill="#1F6F68"/>
+        <circle id="m02" cx="0" cy="815" r="14" fill="#C9821F" opacity="0"/>
+        <circle id="m08" cx="0" cy="815" r="12" fill="#C9821F" opacity="0"/>
+        <circle id="m0830" cx="0" cy="815" r="12" fill="#C9821F" opacity="0"/>
+      </g>
+      <g id="hours" font-size="24" fill="#5E6B68" text-anchor="middle" font-family="Assistant,Rubik,Heebo,Arial"></g>
+    </svg>
+
+    <div class="tag">הדגמת קונספט</div>
+    <div class="chip" id="clock">08:00</div>
+    <div class="legend" id="legend" aria-hidden="true"><span><i style="background:#8C9694"></i>טרם נבדק</span><span><i style="background:#1F6F68"></i>אמין</span><span><i style="background:#C9821F"></i>חשוד</span></div>
+    <div class="cap" id="cap" aria-live="polite"></div>
+    <div class="bubble" id="bTech"></div>
+    <div class="bubble" id="bSvc"></div>
+
+    <div class="overlay" id="startOv">
+      <h1>בקרת נתוני ניטור אוויר</h1>
+      <p class="lead">יום אחד בבקרת נתוני ניטור האוויר. לפני, ואחרי.</p>
+      <p>הדגמת קונספט · כ-58 שניות · בלי קול</p>
+      <button class="big" id="playBig" aria-label="הפעלת הסרטון">▶ הפעלה</button>
+    </div>
+    <div class="overlay" id="endOv" hidden>
+      <h1>אותו יום. הפעם הניטור לא עוצר.</h1>
+      <button class="big" id="replayBig" aria-label="צפייה חוזרת">↺ צפייה חוזרת</button>
+    </div>
+  </div>
+</div>
+<div id="controls">
+  <button id="btnPlay" aria-label="הפעלה או השהיה">▶</button>
+  <button id="btnRestart" aria-label="התחלה מחדש">↺</button>
+  <input id="seek" type="range" min="0" max="58" step="0.1" value="0" aria-label="מיקום בסרטון">
+  <span id="time">0:00 / 0:58</span>
+</div>
+
+<script>
+/* ===== CONTENT: scenes, times and on-screen text (edit wording here only) ===== */
+const FILM = {
+  duration: 58,
+  scenes: [
+    { id: 1, part: "A", start: 0,  end: 6,  clock: ["08:00","08:00"] },
+    { id: 2, part: "B", start: 6,  end: 14, clock: ["08:00","08:30"] },
+    { id: 3, part: "C", start: 14, end: 22, clock: ["00:00","01:50"] },
+    { id: 4, part: "C", start: 22, end: 30, clock: ["02:00","02:10"] },
+    { id: 5, part: "C", start: 30, end: 39, clock: ["08:00","08:10"] },
+    { id: 6, part: "C", start: 39, end: 47, clock: ["08:30","08:40"] },
+    { id: 7, part: "D", start: 47, end: 58, clock: ["09:30","09:30"] }
+  ],
+  captions: [
+    { from: 0.6,  to: 5.8,  text: "שמונה בבוקר. נתונים מכל התחנות והארובות." },
+    { from: 6.3,  to: 10.0, text: "כל ערוץ נבדק ביד, אחד אחרי השני." },
+    { from: 10.2, to: 13.8, text: "מה שקרה אחרי הבדיקה, מתגלה למחרת." },
+    { from: 14.5, to: 17.8, text: "אותו יום. השירות מנטר יחד איתכם, כל הזמן." },
+    { from: 18.0, to: 21.8, text: "כל נתון נבדק ברגע שהוא מגיע." },
+    { from: 22.4, to: 26.0, text: "02:00 · התרעה חמורה עולה מיד למנהל." },
+    { from: 26.2, to: 29.8, text: "המנהל מחליט ומפעיל את הגורמים הרלוונטיים." },
+    { from: 30.4, to: 33.3, text: "בבוקר מחכה לרכזת תור קצר לבקרה." },
+    { from: 33.4, to: 36.2, text: "מה שלא הוכרע, וסימנים לבעיה שמתקרבת." },
+    { from: 36.3, to: 38.9, text: "כל נתון חשוד מגיע עם הסבר." },
+    { from: 39.4, to: 42.5, text: "מכשיר תקול בתחנה: נפתחת תקלה מול הטכנאי." },
+    { from: 47.4, to: 50.8, text: "הנתון המאומת מתפרסם. בביטחון." },
+    { from: 51.2, to: 57.8, text: "אותו יום. הפעם הניטור לא עוצר." }
+  ],
+  bubbles: [
+    { who: "tech", from: 42.6, to: 44.3, text: "אני תיקנתי" },
+    { who: "svc",  from: 44.4, to: 46.9, text: "לא, לא תיקנת, הלחץ עדיין שמונה מאות" }
+  ]
+};
+
+/* ===== ENGINE: one timeline; everything is computed from t ===== */
+const REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const easeIO = p => p < .5 ? 4*p*p*p : 1 - Math.pow(-2*p + 2, 3) / 2;
+const prog = (t, a, b) => { const p = clamp((t - a) / (b - a), 0, 1); return REDUCED ? (p > 0 ? 1 : 0) : easeIO(p); };
+const win = (t, a, b, f = .35) => REDUCED ? (t >= a && t < b ? 1 : 0) : Math.min(prog(t, a, a + f), 1 - prog(t, b - f, b));
+const hx = h => 1450 - (h / 24) * 1300;            /* RTL: 00:00 at the right */
+
+/* hour labels */
+[0,6,12,18,24].forEach(h => { const tx = document.createElementNS(NS, "text"); tx.setAttribute("x", hx(h)); tx.setAttribute("y", 862); tx.textContent = String(h).padStart(2,"0") + ":00"; $("hours").appendChild(tx); });
+
+/* monitor grid for the manual check: 40 channels */
+const cells = [], COLS = 8, ROWS = 5, SILENT_CELL = 9;
+for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+  const g = document.createElementNS(NS, "rect");
+  g.setAttribute("x", 886 - c * 56); g.setAttribute("y", 262 + r * 64); g.setAttribute("width", 46); g.setAttribute("height", 46); g.setAttribute("rx", 7);
+  $("gridG").appendChild(g); cells.push(g);
+}
+const cursor = document.createElementNS(NS, "rect");
+cursor.setAttribute("width", 54); cursor.setAttribute("height", 54); cursor.setAttribute("rx", 9); cursor.setAttribute("fill", "none"); cursor.setAttribute("stroke", "#1F2A2E"); cursor.setAttribute("stroke-width", 5);
+$("gridG").appendChild(cursor);
+
+/* calm overview: small rows of dots */
+for (let r = 0; r < 5; r++) for (let c = 0; c < 9; c++) {
+  const d = document.createElementNS(NS, "circle");
+  d.setAttribute("cx", 880 - c * 48); d.setAttribute("cy", 290 + r * 62); d.setAttribute("r", 13);
+  d.setAttribute("fill", (r === 1 && c === 6) ? "#C9821F" : "#1F6F68"); d.setAttribute("opacity", ".85");
+  $("calmG").appendChild(d);
+}
+
+/* trend screen bars */
+const BAR_H = [30, 48, 38, 62], bars = BAR_H.map((h, i) => { const b = document.createElementNS(NS, "rect"); b.setAttribute("x", 62 + i * 38); b.setAttribute("width", 24); b.setAttribute("rx", 4); $("bars").appendChild(b); return b; });
+
+/* polylines -> measurable paths */
+const parse = id => {
+  const pts = $(id).getAttribute("points").trim().split(/\s+/).map(s => s.split(",").map(Number));
+  const segs = []; let len = 0;
+  for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); segs.push({ a: pts[i-1], b: pts[i], l, s: len }); len += l; }
+  return { segs, len };
+};
+const at = (p, s) => { const d = s * p.len; for (const g of p.segs) if (d <= g.s + g.l) { const k = (d - g.s) / g.l; return [g.a[0] + (g.b[0]-g.a[0])*k, g.a[1] + (g.b[1]-g.a[1])*k]; } const e = p.segs[p.segs.length-1].b; return e; };
+
+/* data dots: 0 stack, 1 station A, 2 station B, 3-4 smaller sources */
+const paths = ["p0","p1","p2","p3","p4"].map(parse);
+const DOTS_PER = [10, 10, 10, 6, 6], dots = [];
+paths.forEach((p, pi) => { for (let k = 0; k < DOTS_PER[pi]; k++) { const c = document.createElementNS(NS, "circle"); c.setAttribute("r", 9); $("dots").appendChild(c); dots.push({ pi, k, n: DOTS_PER[pi], el: c }); } });
+const GATE_X = 1100;
+
+/* outflow dots */
+const outs = ["o0","o1"].map(parse), OUT_PER = 8, outDots = [];
+outs.forEach((p, pi) => { for (let k = 0; k < OUT_PER; k++) { const c = document.createElementNS(NS, "circle"); c.setAttribute("r", 9); c.setAttribute("fill", "#1F6F68"); $("outDots").appendChild(c); outDots.push({ pi, k, el: c }); } });
+
+function sceneAt(t) { return FILM.scenes.find(s => t >= s.start && t < s.end) || FILM.scenes[FILM.scenes.length - 1]; }
+function clockText(t) {
+  const s = sceneAt(t); const [a, b] = s.clock;
+  const toMin = x => { const [h, m] = x.split(":").map(Number); return h * 60 + m; };
+  const m = Math.round(toMin(a) + (toMin(b) - toMin(a)) * clamp((t - s.start) / (s.end - s.start), 0, 1));
+  return String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+}
+const op = (id, v) => $(id).setAttribute("opacity", v);
+
+function render(t) {
+  const svc = t >= 14;                              /* the service exists from scene 3 */
+  const nightK = t < 14 ? 0 : (t < 30 ? prog(t, 14, 14.8) * (1 - prog(t, 29.4, 30.2)) : 0);
+  op("night", (nightK * 0.10).toFixed(3));
+  op("gate", svc ? prog(t, 14.2, 15.2) : 0);
+  op("dim", (nightK * 0.35).toFixed(3));
+  $("legend").style.opacity = t >= 15.2 ? (prog(t, 15.2, 15.8) * (1 - prog(t, 46.4, 47))).toFixed(2) : 0;
+
+  /* people */
+  const ellaOn = t < 14 ? prog(t, 0, .8) : (t >= 30 ? prog(t, 30, 30.8) : 1 - prog(t, 14, 14.6));
+  $("ella").setAttribute("opacity", ellaOn);
+  const lean = REDUCED ? 0 : Math.sin(t * 2.2) * 2;
+  $("ellaArm").setAttribute("transform", (t >= 47.6 && t < 48.4) ? "translate(-6,6)" : `rotate(${lean},150,190)`);
+  op("mgr", win(t, 22.3, 30, .5));
+  const ringP = REDUCED ? 0 : ((t - 24.6) % 1.1) / 1.1;
+  op("ring", t > 24.6 && t < 27 ? (1 - ringP).toFixed(2) : 0);
+  $("ring").setAttribute("r", 30 + ringP * 40);
+  $("phoneScr").setAttribute("fill", t > 24.5 && t < 30 ? "#C9821F" : "#3A4744");
+  op("parties", win(t, 26.2, 30, .4));
+  ["l0","l1","l2"].forEach((id, i) => { const p = prog(t, 26.3 + i * .35, 27.2 + i * .35); const L = 260; $(id).setAttribute("stroke-dasharray", L); $(id).setAttribute("stroke-dashoffset", (L * (1 - p)).toFixed(1)); });
+  op("tech", win(t, 39.8, 47, .5));
+  $("wrench").setAttribute("transform", `translate(150,170) rotate(${t > 45 && t < 46.4 && !REDUCED ? Math.sin(t * 18) * 25 : 0})`);
+  const stuck = t >= 39.6 && t < 46.5;
+  op("stRing", stuck ? (REDUCED ? 1 : (.55 + .45 * Math.sin(t * 5)).toFixed(2)) : 0);
+
+  /* monitor content */
+  const gridOn = t < 14 ? 1 - prog(t, 13.6, 14) : 0;
+  op("gridG", gridOn);
+  const k = clamp((t - 6.3) / 7.2, 0, 1), idx = Math.min(cells.length - 1, Math.floor(k * cells.length));
+  cells.forEach((c, i) => {
+    const checked = t >= 6.3 && i < idx;
+    const silent = i === SILENT_CELL && t >= 10.6;  /* already-checked channel goes silent at 08:30 */
+    c.setAttribute("fill", silent ? "#A7B0AE" : (checked ? "#5E6B68" : "#E3E7E6"));
+  });
+  const cc = cells[t < 6.3 ? 0 : idx];
+  cursor.setAttribute("x", +cc.getAttribute("x") - 4); cursor.setAttribute("y", +cc.getAttribute("y") - 4);
+  cursor.setAttribute("opacity", t >= 6.3 && t < 13.6 ? 1 : 0);
+  op("calmG", (t >= 15 && t < 30 ? prog(t, 15, 16) : 0) || (t >= 39 && t < 47 ? prog(t, 39, 39.6) : 0) || (t >= 51 ? prog(t, 51, 51.6) : 0));
+  op("queueG", win(t, 30.3, 39.2, .4));
+  ["card0","card1","card2"].forEach((id, i) => { const p = prog(t, 30.6 + i * .5, 31.3 + i * .5); $(id).setAttribute("opacity", p); $(id).setAttribute("transform", `translate(${(1 - p) * -40},0)`); });
+  op("explain", prog(t, 36.1, 36.7));
+  op("approveG", win(t, 47, 51.4, .4));
+  $("btn").setAttribute("transform", t >= 47.6 && t < 48.0 ? "translate(700,535) scale(.94) translate(-700,-535)" : "");
+
+  /* destinations (scene 7) */
+  const destOn = t >= 47 ? prog(t, 47.3, 47.9) : 0;
+  op("pub", destOn); op("ana", destOn);
+  $("pubWave").setAttribute("stroke-dasharray", 1); $("pubWave").setAttribute("stroke-dashoffset", (1 - prog(t, 48.3, 51)).toFixed(3));
+  bars.forEach((b, i) => { const h = BAR_H[i] * prog(t, 48.6 + i * .35, 49.4 + i * .35); b.setAttribute("y", (300 - h).toFixed(1)); b.setAttribute("height", h.toFixed(1)); });
+  $("trend").setAttribute("stroke-dasharray", 1); $("trend").setAttribute("stroke-dashoffset", (1 - prog(t, 49.6, 52)).toFixed(3));
+  const outK = t >= 47.8 ? prog(t, 47.8, 48.2) * (1 - prog(t, 53, 53.6)) : 0;
+  op("outPaths", outK.toFixed(2));
+  outDots.forEach(d => {
+    const phase = REDUCED ? d.k / OUT_PER : (t - 48) * .3 - d.k / OUT_PER;
+    const vis = phase >= 0 ? outK : 0;
+    const [x, y] = at(outs[d.pi], ((phase % 1) + 1) % 1);
+    d.el.setAttribute("cx", x.toFixed(1)); d.el.setAttribute("cy", y.toFixed(1)); d.el.setAttribute("opacity", vis.toFixed(2));
+  });
+
+  /* source status lights: 0 stack, 1 station A (silent in B), 2 station B (stuck in scene 6) */
+  ["sd0","sd1","sd2"].forEach((id, i) => {
+    let f = "#A7B0AE";
+    if (svc) f = "#1F6F68";
+    if (i === 2 && stuck) f = "#C9821F";
+    if (i === 1 && t >= 10.6 && t < 14) f = "#D9DEDD";
+    $(id).setAttribute("fill", f);
+  });
+
+  /* data dots: gray until the check band, then reliable or suspicious */
+  dots.forEach(d => {
+    const p = paths[d.pi]; const speed = REDUCED ? 0 : .085;
+    const s = ((t * speed + d.k / d.n) % 1 + 1) % 1;
+    let vis = 1;
+    if (d.pi === 1 && t >= 10.6 && t < 14) vis = 0;            /* silent station, nobody notices */
+    if (d.pi === 2 && stuck) vis = 0;                          /* stuck instrument */
+    if (t >= 47.4 && t < 52.5) vis = .35;
+    const [x, y] = at(p, s);
+    let fill = "#8C9694";
+    if (svc && x < GATE_X) fill = (d.pi === 0 && d.k === 4) ? "#C9821F" : "#1F6F68";
+    d.el.setAttribute("cx", x.toFixed(1)); d.el.setAttribute("cy", y.toFixed(1));
+    d.el.setAttribute("fill", fill); d.el.setAttribute("opacity", (vis * (t < 0.4 ? 0 : 1)).toFixed(2));
+  });
+
+  /* severe alert at 02:00: from the check band to the manager */
+  if (t >= 22.4 && t < 26) {
+    const a = prog(t, 23.2, 24.6);
+    const P = [[1100,443],[990,215],[420,215],[322,610]];
+    const seg = a * 3, i = Math.min(2, Math.floor(seg)), f = seg - i;
+    const x = P[i][0] + (P[i+1][0]-P[i][0]) * f, y = P[i][1] + (P[i+1][1]-P[i][1]) * f;
+    $("alarm").setAttribute("transform", `translate(${x.toFixed(1)},${y.toFixed(1)})`);
+    const pulse = REDUCED ? 0 : (t * 1.6) % 1;
+    $("alarmRing").setAttribute("r", 20 + pulse * 30); $("alarmRing").setAttribute("opacity", (1 - pulse).toFixed(2));
+    op("alarm", 1 - prog(t, 24.6, 25.2));
+  } else op("alarm", 0);
+
+  /* fault ticket: station B -> technician next to it */
+  if (t >= 40 && t < 42.6) {
+    const a = prog(t, 40.2, 41.6);
+    const x = 1495 + (1340 - 1495) * a, y = 566 + (640 - 566) * a - Math.sin(a * Math.PI) * 80;
+    $("ticket").setAttribute("transform", `translate(${x.toFixed(1)},${y.toFixed(1)})`);
+    op("ticket", 1 - prog(t, 41.8, 42.4));
+  } else op("ticket", 0);
+
+  /* 24h strips */
+  op("stripToday", t < 14 ? 1 - prog(t, 13.6, 14) : prog(t, 51, 51.8));
+  $("tCheck").setAttribute("cx", hx(8)); op("tCheck", t >= 1 ? 1 : 0);
+  const gapP = t < 14 ? prog(t, 10.4, 11.4) : 1;
+  const gw = (hx(8.5) - hx(24)) * gapP;
+  $("tGap").setAttribute("x", (hx(8.5) - gw).toFixed(1)); $("tGap").setAttribute("width", gw.toFixed(1)); op("tGap", gapP > 0 ? 1 : 0);
+  op("tTomorrow", gapP);
+  $("stripToday").setAttribute("transform", t >= 51 ? `translate(0,${(-70 * prog(t, 51, 51.8)).toFixed(1)})` : "");
+  op("stripSvc", svc ? prog(t, 14.3, 15) : 0);
+  let hh = 0;
+  if (t >= 14) { const c = clockText(t).split(":").map(Number); hh = c[0] + c[1] / 60; }
+  if (t >= 30) hh = Math.max(hh, 8);
+  if (t >= 47) hh = 9.5 + (24 - 9.5) * prog(t, 51.8, 55);
+  const fw = (hx(0) - hx(hh)); $("sFill").setAttribute("x", (hx(0) - fw).toFixed(1)); $("sFill").setAttribute("width", Math.max(0, fw).toFixed(1));
+  $("m02").setAttribute("cx", hx(2)); op("m02", t >= 23.4 ? 1 : 0); $("m02").setAttribute("fill", t >= 28 ? "#1F6F68" : "#C9821F"); $("m02").setAttribute("stroke", "#fff"); $("m02").setAttribute("stroke-width", 4);
+  $("m08").setAttribute("cx", hx(8)); op("m08", t >= 30.4 ? 1 : 0);
+  $("m0830").setAttribute("cx", hx(8.5)); op("m0830", t >= 39.6 ? 1 : 0); $("m0830").setAttribute("fill", t >= 46.5 ? "#1F6F68" : "#C9821F");
+
+  /* text layers */
+  const cap = FILM.captions.find(c => t >= c.from && t < c.to);
+  const capEl = $("cap");
+  if (cap) { if (capEl.textContent !== cap.text) capEl.textContent = cap.text; const o = win(t, cap.from, cap.to, .3); capEl.style.opacity = o; capEl.style.transform = REDUCED ? "" : `translateY(${(1 - o) * 10}px)`; }
+  else capEl.style.opacity = 0;
+  FILM.bubbles.forEach(b => { const el = $(b.who === "tech" ? "bTech" : "bSvc"); if (el.textContent !== b.text) el.textContent = b.text; const o = win(t, b.from, b.to, .3); el.style.opacity = o; el.style.transform = REDUCED ? "" : `scale(${.94 + .06 * o})`; });
+  $("clock").textContent = clockText(t);
+}
+
+/* ===== PLAYER ===== */
+let t = 0, playing = false, last = 0;
+const seek = $("seek"), timeEl = $("time"), btnPlay = $("btnPlay");
+const fmt = s => Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+function draw() { render(t); seek.value = t.toFixed(1); timeEl.textContent = fmt(t) + " / " + fmt(FILM.duration); btnPlay.textContent = playing ? "❚❚" : "▶"; }
+function frame(now) {
+  if (!playing) return;
+  t += (now - last) / 1000; last = now;
+  if (t >= FILM.duration) { t = FILM.duration; playing = false; $("endOv").hidden = false; draw(); return; }
+  draw(); requestAnimationFrame(frame);
+}
+function play() { if (t >= FILM.duration) t = 0; $("startOv").hidden = true; $("endOv").hidden = true; playing = true; last = performance.now(); requestAnimationFrame(frame); draw(); }
+function pause() { playing = false; draw(); }
+function restart() { t = 0; play(); }
+$("playBig").addEventListener("click", play);
+$("replayBig").addEventListener("click", restart);
+btnPlay.addEventListener("click", () => playing ? pause() : play());
+$("btnRestart").addEventListener("click", restart);
+seek.addEventListener("input", () => { t = +seek.value; $("startOv").hidden = true; $("endOv").hidden = t < FILM.duration; if (playing) last = performance.now(); draw(); });
+document.addEventListener("keydown", e => { if (e.code === "Space" && e.target.tagName !== "BUTTON") { e.preventDefault(); playing ? pause() : play(); } });
+
+/* fit the 1600x900 stage into the frame */
+function fit() { const w = $("frame").clientWidth; $("stage").style.transform = `scale(${w / 1600})`; }
+window.addEventListener("resize", fit); fit();
+
+/* testing aid: #t=12.5 opens paused at that second */
+const m = location.hash.match(/t=([\d.]+)/);
+if (m) { t = clamp(+m[1], 0, FILM.duration); $("startOv").hidden = true; }
+draw();
+</script>
+</body>
+</html>
