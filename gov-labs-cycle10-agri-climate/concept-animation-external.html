@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>העוזר האישי שלך — הדגמת קונספט</title>
+<style>
+:root{
+  --bg:#F6F4EE; --ink:#1E2722; --mute:#8A928C; --muteText:#58615B;
+  --teal:#1F7A8C; --tealDark:#145A68; --ochre:#C9902A; --u:12.8px;
+  font-family:"Assistant","Rubik","Heebo","Arial Hebrew",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#E9E6DC;color:var(--ink)}
+body{display:flex;align-items:center;justify-content:center;font-family:inherit;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input{font-family:inherit}
+#app{display:flex;flex-direction:column}
+
+/* ---------- במה ---------- */
+.stage{position:relative;overflow:hidden;background:var(--bg);border-radius:16px;box-shadow:0 18px 50px rgba(30,39,34,.12);isolation:isolate}
+.portrait .stage{border-radius:0;box-shadow:none;display:flex;flex-direction:column}
+
+.visual{position:absolute;inset:0;z-index:1}
+.visual>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.portrait .visual{position:relative;inset:auto;width:100%;aspect-ratio:1000/562;flex:none}
+
+/* ---------- כתובית ---------- */
+.caption{position:absolute;left:0;right:0;bottom:0;height:16%;z-index:5;background:rgba(246,244,238,.95);border-top:1px solid rgba(30,39,34,.07)}
+.cap{position:absolute;left:5%;right:5%;top:50%;margin:0;text-align:center;font-weight:700;font-size:max(15px,calc(var(--u)*2.1));line-height:1.3;opacity:0;visibility:hidden;transform:translateY(-50%)}
+.portrait .caption{position:relative;left:auto;right:auto;bottom:auto;height:auto;min-height:clamp(74px,calc(var(--u)*20),110px);flex:none}
+.portrait .cap{font-size:clamp(17px,calc(var(--u)*4.5),26px)}
+
+/* ---------- שכבות HTML על האיור ---------- */
+.badge{position:absolute;top:4%;right:3%;display:flex;align-items:center;gap:.4em;background:#FBFAF7;border:1px solid rgba(30,39,34,.14);border-radius:999px;padding:.35em .9em;font-weight:700;font-size:max(12px,calc(var(--u)*1.35));line-height:1.2;box-shadow:0 2px 8px rgba(30,39,34,.06)}
+.portrait .badge{font-size:clamp(12px,calc(var(--u)*3.1),17px);padding:.25em .7em}
+.badge .rw{display:none;width:1.1em;height:1.1em;color:var(--teal)}
+.badge .rw.on{display:inline-block}
+.badge .rw svg{width:100%;height:100%;display:block}
+#dayTxt{display:inline-block}
+
+.chip{position:absolute;left:0;top:0;white-space:nowrap;background:#FBFAF7;border:1px solid rgba(30,39,34,.16);border-radius:999px;padding:.3em .75em;font-size:max(11px,calc(var(--u)*1.15));font-weight:700;line-height:1.2;opacity:0;visibility:hidden;box-shadow:0 2px 8px rgba(30,39,34,.06);transform:translate(-50%,-50%)}
+.chip.src{border-color:rgba(31,122,140,.5);color:var(--tealDark);background:#F4FAFA}
+.portrait .chip{font-size:clamp(11px,calc(var(--u)*2.8),15px);padding:.22em .6em}
+
+.tag{position:absolute;white-space:nowrap;padding:.32em .8em;border-radius:999px;font-weight:700;font-size:max(11px,calc(var(--u)*1.15));color:#fff;line-height:1.2;opacity:0;visibility:hidden}
+.portrait .tag{font-size:clamp(11px,calc(var(--u)*2.8),15px);padding:.25em .6em}
+.tag .tbg{position:absolute;inset:0;background:var(--teal);border-radius:inherit;transform-origin:100% 50%;transform:scaleX(0);box-shadow:0 3px 10px rgba(31,122,140,.25)}
+.tag .ts{position:relative;opacity:0}
+#tagC{left:58.9%;top:56.2%;transform:translate(-50%,-50%)}
+#tagB{right:2%;top:45.4%;transform:translateY(-50%)}
+
+/* ---------- אזור תחתון: צ'אט ושבוע ---------- */
+.lower{position:absolute;left:0;right:0;top:0;bottom:16%;z-index:4;pointer-events:none}
+.portrait .lower{position:relative;left:auto;right:auto;top:auto;bottom:auto;flex:1;min-height:0}
+
+.chat{position:absolute;left:2%;top:9%;bottom:4%;width:31%;background:#FBFAF7;border:1px solid rgba(30,39,34,.10);border-radius:max(14px,calc(var(--u)*2));box-shadow:0 12px 32px rgba(30,39,34,.12);overflow:hidden;opacity:0;visibility:hidden;font-size:max(12.5px,calc(var(--u)*1.2))}
+.portrait .chat{left:12px;right:12px;top:4px;bottom:10px;width:auto;font-size:clamp(14px,calc(var(--u)*3.7),19px);border-radius:18px}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.chead{flex:none;display:flex;align-items:center;gap:.6em;padding:.7em .9em;border-bottom:1px solid rgba(30,39,34,.08);background:#F1F0EA;font-weight:700}
+.chead.group{justify-content:space-around;gap:.2em;padding:.55em .3em}
+.pt{display:flex;flex-direction:column;align-items:center;gap:.25em;font-size:.8em;font-weight:700;text-align:center;line-height:1.15;flex:1}
+.av{width:2.2em;height:2.2em;border-radius:50%;display:grid;place-items:center;flex:none}
+.pt .av{width:2.1em;height:2.1em;font-size:1.1em}
+.av svg{width:58%;height:58%;display:block}
+.av-as{background:var(--teal)}
+.av-eli{background:#66753A}
+.av-adv{background:#6F7D73}
+.msgs{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:.55em;padding:.8em;overflow:hidden}
+.msg{display:none;max-width:88%}
+.msg.on{display:block}
+.msg.in{align-self:flex-end}
+.msg.out{align-self:flex-start}
+.bub{padding:.6em .8em;border-radius:1em;line-height:1.45;font-weight:400}
+.in .bub{background:#fff;border:1px solid rgba(31,122,140,.28);border-bottom-left-radius:.3em}
+.out .bub{background:#E2E9DD;border-bottom-right-radius:.3em}
+.bub.dots{padding:.75em .9em;line-height:0}
+.bub.dots i{display:inline-block;width:.45em;height:.45em;border-radius:50%;background:var(--mute);margin:0 .12em}
+.bub.photo{padding:.4em .4em .55em}
+.bub.photo svg{display:block;width:9.5em;height:6.6em;border-radius:.7em}
+.bub.photo span{display:block;padding:.4em .4em 0}
+.cinput{flex:none;display:flex;align-items:center;gap:.5em;padding:.55em .7em;border-top:1px solid rgba(30,39,34,.08);background:#F7F6F1}
+.field{flex:1;min-height:2.2em;border-radius:1.1em;background:#fff;border:1px solid rgba(30,39,34,.12);padding:.4em .8em;line-height:1.35;font-size:.95em;display:flex;align-items:center;flex-wrap:wrap}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--teal);margin-inline-start:2px;vertical-align:middle;opacity:0}
+.send{width:2.2em;height:2.2em;border-radius:50%;background:var(--teal);display:grid;place-items:center;flex:none}
+.send svg{width:52%;height:52%}
+.handoff{flex:none;display:flex;flex-direction:column;align-items:center;gap:.4em;padding:0 .8em .4em}
+.hline{width:2px;height:.9em;background:var(--teal);opacity:0}
+.card{width:80%;background:#fff;border:1px solid rgba(30,39,34,.13);border-radius:.7em;padding:.45em .75em;display:flex;align-items:center;gap:.5em;font-size:.92em;line-height:1.3;opacity:0;visibility:hidden;box-shadow:0 3px 10px rgba(30,39,34,.07)}
+.card .d{width:.65em;height:.65em;border-radius:50%;flex:none}
+.card b{font-weight:700}
+
+/* שבוע */
+.week{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6%;background:var(--bg);opacity:0;visibility:hidden;padding:3% 7%;font-size:max(13px,calc(var(--u)*1.55))}
+.portrait .week{font-size:clamp(13px,calc(var(--u)*3.6),19px);padding:12px 14px;gap:22px}
+.wrow{width:min(100%,46em);display:grid;grid-template-columns:7.2em 1fr;align-items:end;gap:1em;opacity:0}
+.portrait .wrow{grid-template-columns:1fr;gap:.2em}
+.wlabel{font-weight:700;padding-bottom:.55em}
+.portrait .wlabel{padding-bottom:0}
+.wcells{display:grid;grid-template-columns:repeat(5,1fr);gap:.35em;padding-top:2.7em}
+.wc{position:relative;height:2.5em;border-radius:.55em;display:grid;place-items:center;font-size:.85em;font-weight:700;background:#E5E4DC;color:#4B534E;border:1px solid rgba(30,39,34,.06)}
+.wc span.t{position:relative}
+.wc .hl{position:absolute;inset:0;border-radius:inherit;opacity:0}
+#wr1 .hl{background:#EED9AA;box-shadow:inset 0 0 0 2px var(--ochre)}
+#wr2 .wc{background:#E3ECEC}
+#wr2 .hl{background:#CBE4E8;box-shadow:inset 0 0 0 2px var(--teal)}
+.mark{position:absolute;bottom:calc(100% + .5em);left:50%;white-space:nowrap;padding:.3em .75em;border-radius:999px;font-weight:700;font-size:1.02em;opacity:0;visibility:hidden;transform:translateX(-50%)}
+.mark::after{content:"";position:absolute;top:100%;left:50%;margin-left:-.35em;border:.35em solid transparent;border-top-color:inherit}
+.m-today{background:#E8D1A0;color:var(--ink);border-color:#E8D1A0}
+.m-svc{background:var(--teal);color:#fff;border-color:var(--teal)}
+.mark.m-today::after{border-top-color:#E8D1A0}
+.mark.m-svc::after{border-top-color:var(--teal)}
+
+/* ---------- מסך סיום ומסך פתיחה ---------- */
+.end,.start{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6%;background:var(--bg)}
+.end{z-index:12;gap:.8em;opacity:0;visibility:hidden}
+.start{z-index:15;gap:1.4em}
+.end h2,.start h1{margin:0;font-weight:700;font-size:max(26px,calc(var(--u)*4.2));line-height:1.15}
+.end p{margin:0;font-size:max(16px,calc(var(--u)*1.9));line-height:1.45;max-width:28em;font-weight:400}
+.end .min{font-size:max(13px,calc(var(--u)*1.35));color:var(--muteText);font-weight:700}
+.portrait .end h2,.portrait .start h1{font-size:clamp(28px,calc(var(--u)*8.4),46px)}
+.portrait .end p{font-size:clamp(17px,calc(var(--u)*4.6),24px)}
+.portrait .end .min{font-size:clamp(14px,calc(var(--u)*3.6),18px)}
+.end .motif,.start .motif{width:min(220px,40%);height:auto}
+.end>*{opacity:0}
+.btn-replay{margin-top:.6em;min-height:44px;min-width:44px;padding:.55em 1.3em;border-radius:999px;border:2px solid var(--teal);background:transparent;color:var(--tealDark);font-weight:700;font-size:max(15px,calc(var(--u)*1.35));display:inline-flex;align-items:center;gap:.5em;cursor:pointer}
+.btn-replay svg{width:1.1em;height:1.1em}
+.btn-start{width:max(72px,calc(var(--u)*7));height:max(72px,calc(var(--u)*7));border-radius:50%;border:none;background:var(--teal);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 26px rgba(31,122,140,.28)}
+.btn-start svg{width:38%;height:38%;margin-left:8%}
+.start.hidden{display:none}
+
+.concept{position:absolute;top:2.2%;left:1.6%;z-index:20;font-size:max(11px,calc(var(--u)*1.0));background:rgba(30,39,34,.8);color:#fff;border-radius:999px;padding:.25em .75em;font-weight:700;line-height:1.3;pointer-events:none}
+.portrait .concept{top:calc(100vw * 0.562 - 26px);left:8px;font-size:11px}
+.num{display:inline-block;direction:ltr;unicode-bidi:isolate}
+
+/* ---------- בקרים ---------- */
+.controls{display:flex;align-items:center;gap:8px;height:56px;padding:0 8px}
+.cbtn{width:44px;height:44px;border-radius:50%;border:none;background:transparent;color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}
+.cbtn:hover{background:rgba(30,39,34,.06)}
+.cbtn svg{width:22px;height:22px}
+#seek{flex:1;min-width:60px;height:44px;margin:0;accent-color:var(--teal);cursor:pointer;background:transparent}
+#time{font-variant-numeric:tabular-nums;font-size:14px;min-width:6.4em;text-align:center;color:var(--muteText);flex:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="stage" id="stage">
+
+    <!-- ===== האיור ===== -->
+    <div class="visual" id="visual">
+      <svg id="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 562" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#F7F5EF"/><stop offset="1" stop-color="#ECEFE4"/>
+          </linearGradient>
+          <linearGradient id="gGround" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#E9E3D2"/><stop offset="1" stop-color="#E1DAC6"/>
+          </linearGradient>
+          <clipPath id="insetClip"><circle cx="720" cy="190" r="103"/></clipPath>
+        </defs>
+
+        <rect width="1000" height="562" fill="url(#gSky)"/>
+        <circle cx="300" cy="72" r="30" fill="#EFDDB2" opacity=".75"/>
+        <g id="hillsFar"><path d="M-80 300 C 80 240, 200 250, 330 275 S 600 220, 760 250 S 960 230, 1100 260 L1100 320 L-80 320Z" fill="#E3E8DA"/></g>
+        <g id="hillsNear"><path d="M-80 315 C 120 280, 260 300, 420 292 S 700 270, 860 290 S 1000 285, 1100 295 L1100 330 L-80 330Z" fill="#D8DFCB"/></g>
+        <rect y="305" width="1000" height="257" fill="url(#gGround)"/>
+
+        <!-- השדה -->
+        <g id="field">
+          <rect x="468" y="330" width="242" height="134" rx="12" fill="#DCD2B8"/>
+          <rect x="728" y="330" width="250" height="134" rx="12" fill="#DCD2B8"/>
+          <path d="M480 390 H698 M480 434 H698 M740 390 H966 M740 434 H966" stroke="#CFC4A5" stroke-width="2" stroke-linecap="round"/>
+          <rect id="hlC" x="468" y="330" width="242" height="134" rx="12" fill="#1F7A8C" fill-opacity=".08" stroke="#1F7A8C" stroke-width="3" opacity="0"/>
+          <rect id="hlB" x="728" y="330" width="250" height="134" rx="12" fill="#1F7A8C" fill-opacity=".08" stroke="#1F7A8C" stroke-width="3" opacity="0"/>
+          <g id="bananaBack"></g>
+          <g id="cabbages"></g>
+          <g id="bananaFront"></g>
+          <path id="dripGlow" d="M450 446 H978" stroke="#1E2722" stroke-width="16" stroke-linecap="round" fill="none" opacity="0"/>
+          <path id="drip" d="M450 446 H978" stroke="#7B8780" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <g id="emitters"></g>
+          <g id="deposits"></g>
+          <g id="grains"></g>
+          <rect x="436" y="436" width="18" height="20" rx="3" fill="#6E7871"/>
+        </g>
+
+        <!-- תקריב שתיל -->
+        <g id="inset" opacity="0">
+          <line x1="688" y1="288" x2="651" y2="352" stroke="#1E2722" stroke-opacity=".28" stroke-width="2" stroke-dasharray="4 5"/>
+          <circle cx="720" cy="190" r="105" fill="#FBFAF6" stroke="#1E2722" stroke-opacity=".18" stroke-width="3"/>
+          <g clip-path="url(#insetClip)">
+            <rect x="600" y="254" width="240" height="60" fill="#DCD2B8"/>
+            <path d="M720 258 C 718 230, 722 205, 720 166" stroke="#5E8C4E" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <path id="old1" d="M719 238 C 690 214, 650 214, 630 232 C 660 250, 696 248, 719 240Z" fill="#6E9A55"/>
+            <path id="old2" d="M721 232 C 750 206, 792 208, 810 226 C 782 246, 746 244, 721 234Z" fill="#6E9A55"/>
+            <path d="M716 237 C 690 228, 664 228, 642 232 M724 231 C 750 222, 776 222, 798 226" stroke="#FBFAF6" stroke-opacity=".45" stroke-width="2" fill="none"/>
+            <path d="M720 192 C 700 170, 676 160, 662 168 C 674 188, 700 194, 720 196Z" fill="#7FB062"/>
+            <path d="M720 184 C 736 158, 760 146, 774 152 C 766 174, 742 184, 720 188Z" fill="#7FB062"/>
+            <path d="M720 170 C 712 150, 716 136, 722 128 C 730 142, 728 158, 720 170Z" fill="#8DBE6E"/>
+          </g>
+        </g>
+
+        <!-- מסלול החיפוש -->
+        <g id="route" opacity="0">
+          <circle cx="180" cy="205" r="92" fill="none" stroke="#8A928C" stroke-width="2.5" stroke-dasharray="3 9" stroke-linecap="round"/>
+          <circle cx="180" cy="113" r="7" fill="#FBFAF6" stroke="#58615B" stroke-width="2.5"/>
+          <circle cx="259.7" cy="251" r="7" fill="#FBFAF6" stroke="#58615B" stroke-width="2.5"/>
+          <circle cx="100.3" cy="251" r="7" fill="#FBFAF6" stroke="#58615B" stroke-width="2.5"/>
+          <circle cx="180" cy="205" r="27" fill="#FBFAF6" stroke="#58615B" stroke-width="3"/>
+          <line id="hHand" x1="180" y1="205" x2="180" y2="191" stroke="#1E2722" stroke-width="3.5" stroke-linecap="round"/>
+          <line id="mHand" x1="180" y1="205" x2="180" y2="184" stroke="#58615B" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="180" cy="205" r="3" fill="#1E2722"/>
+          <circle id="hop" cx="180" cy="113" r="8" fill="#1E2722"/>
+        </g>
+
+        <!-- אלי -->
+        <g id="eli" transform="translate(-80 460)">
+          <ellipse cx="2" cy="2" rx="26" ry="5" fill="#1E2722" opacity=".1"/>
+          <line id="legB" x1="-7" y1="-68" x2="-7" y2="-2" stroke="#3F453C" stroke-width="10" stroke-linecap="round"/>
+          <line id="legF" x1="7" y1="-68" x2="7" y2="-2" stroke="#4A5046" stroke-width="10" stroke-linecap="round"/>
+          <line id="armB" x1="-12" y1="-126" x2="-12" y2="-76" stroke="#55622F" stroke-width="9" stroke-linecap="round"/>
+          <path d="M-21 -64 Q-24 -120 -14 -132 Q0 -138 14 -132 Q24 -120 21 -64 Z" fill="#66753A"/>
+          <path d="M-4 -134 L2 -122 L8 -134" stroke="#55622F" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="2" cy="-150" r="14" fill="#C99A72"/>
+          <path d="M-12 -158 Q-11 -177 3 -177 Q17 -177 17 -158 Z" fill="#C6AE78"/>
+          <rect x="-11.5" y="-163" width="28.5" height="4" fill="#8C7646"/>
+          <ellipse cx="5" cy="-158" rx="27" ry="5.5" fill="#B89E66"/>
+          <line id="armU" x1="16" y1="-128" x2="16" y2="-100" stroke="#66753A" stroke-width="9" stroke-linecap="round"/>
+          <line id="armF" x1="16" y1="-100" x2="16" y2="-74" stroke="#C99A72" stroke-width="7.5" stroke-linecap="round"/>
+          <g id="phone" opacity="0">
+            <rect x="-6.5" y="-11" width="13" height="22" rx="2.8" fill="#1E2722"/>
+            <rect id="phoneScreen" x="-4.6" y="-8.6" width="9.2" height="16.4" rx="1.6" fill="#1F7A8C" opacity=".35"/>
+          </g>
+        </g>
+
+        <!-- קו המידע -->
+        <path id="info" d="M978 446 H462 Q418 446 417 335" fill="none" stroke="#1F7A8C" stroke-width="5" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" opacity="0"/>
+        <g id="pulses"></g>
+        <g id="srcLines">
+          <path d="M690 112 C 690 200, 520 250, 417 333" fill="none" stroke="#1F7A8C" stroke-width="3" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" opacity="0"/>
+          <path d="M560 188 C 560 250, 470 290, 417 333" fill="none" stroke="#1F7A8C" stroke-width="3" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" opacity="0"/>
+          <path d="M830 188 C 830 270, 560 300, 417 333" fill="none" stroke="#1F7A8C" stroke-width="3" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" opacity="0"/>
+        </g>
+
+        <!-- התמונה שאלי שולח -->
+        <g id="photo" opacity="0">
+          <rect x="-20" y="-15" width="40" height="30" rx="4" fill="#fff" stroke="#1E2722" stroke-opacity=".25" stroke-width="1.5"/>
+          <path d="M-11 9 C -13 -2, -2 -11, 11 -9 C 11 2, 2 11, -11 9Z" fill="#6E9A55"/>
+        </g>
+
+        <g id="streaks" opacity="0">
+          <rect y="150" width="180" height="3" rx="1.5" fill="#1E2722" opacity=".25"/>
+          <rect y="262" width="240" height="3" rx="1.5" fill="#1E2722" opacity=".2"/>
+          <rect y="380" width="160" height="3" rx="1.5" fill="#1E2722" opacity=".22"/>
+        </g>
+        <rect id="flash" width="1000" height="562" fill="#FFFFFF" opacity="0"/>
+      </svg>
+
+      <div class="badge" id="badge">
+        <span class="rw" id="rwIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg></span>
+        <span id="dayTxt">יום ראשון</span>
+      </div>
+
+      <!-- סצנה 3: מקורות החיפוש -->
+      <div class="chip" id="r1" style="left:18%;top:14.95%">מזג אוויר</div>
+      <div class="chip" id="r2" style="left:26.8%;top:50.4%">אגרונום</div>
+      <div class="chip" id="r3" style="left:9.2%;top:50.4%">מדריך</div>
+      <div class="chip" id="r4" style="left:18%;top:62.6%">שעות עד ימים</div>
+
+      <!-- סצנה 5: המקורות של השירות -->
+      <div class="chip src" id="sA" style="left:69%;top:16.9%">המידע של משרד החקלאות על המשק</div>
+      <div class="chip src" id="sB" style="left:56%;top:30.6%">ההנחיה של המדריך</div>
+      <div class="chip src" id="sC" style="left:83%;top:30.6%">שיחות קודמות</div>
+
+      <!-- סצנה 6: תגיות על החלקות -->
+      <div class="tag" id="tagC"><span class="tbg"></span><span class="ts">כרוב</span><span class="ts"> · </span><span class="ts">דישון <span class="num" dir="ltr">−20%</span></span></div>
+      <div class="tag" id="tagB"><span class="tbg"></span><span class="ts">בננות</span><span class="ts"> · </span><span class="ts">דישון <span class="num" dir="ltr">−15%</span></span><span class="ts"> · </span><span class="ts">השקיה ↑</span></div>
+    </div>
+
+    <!-- ===== כתוביות ===== -->
+    <div class="caption" id="caption">
+      <p class="cap" data-a="0.25" data-b="4.5">כל שבוע, אלי מחליט כמה להשקות ולדשן.</p>
+      <p class="cap" data-a="4.7" data-b="10">המליחות במי ההשקיה עולה. אף אחד לא מודיע לו.</p>
+      <p class="cap" data-a="10.2" data-b="15.5">הוא מגלה רק כשהעלים מצהיבים. ואז מתחיל לחפש.</p>
+      <p class="cap" data-a="15.7" data-b="19">אותו שבוע. הפעם, המידע מגיע קודם.</p>
+      <p class="cap" data-a="20.8" data-b="30">בלי להזין נתונים.</p>
+      <p class="cap" data-a="42.4" data-b="46.1">המדריך כבר יודע מה קרה השבוע במים ובדישון.</p>
+      <p class="cap" data-a="46.4" data-b="52">אותו שבוע. אותם מים. ההבדל: מתי אלי יודע.</p>
+    </div>
+
+    <!-- ===== צ'אט ושבוע ===== -->
+    <div class="lower">
+      <div class="chat" id="chat" aria-hidden="true">
+        <div class="screen" id="scrA">
+          <div class="chead">
+            <span class="av av-as"><svg viewBox="0 0 24 24"><path d="M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11z" fill="#fff"/></svg></span>
+            <span>העוזר האישי שלך</span>
+          </div>
+          <div class="msgs">
+            <div class="msg in" data-at="20.6"><div class="bub">בוקר טוב אלי. בימים הקרובים צפויה עלייה במליחות של מי ההשקיה אצלך באזור.</div></div>
+            <div class="msg in" data-at="24.6"><div class="bub">המדריך שלך כבר השאיר הנחיה למצב כזה: להקטין את רמת הדישון ולהתאים את משטר ההשקיה.</div></div>
+            <div class="msg out" data-at="32.8"><div class="bub">בכמה להקטין את הדישון? תפרט לי לפי החלקות.</div></div>
+            <div class="msg in" data-at="33.0" data-until="33.7"><div class="bub dots"><i></i><i></i><i></i></div></div>
+            <div class="msg in" data-at="33.7"><div class="bub">לפי החלקות שלך וההנחיה של המדריך: בכרוב, להפחית את הדישון ב-20%. בבננות, להפחית ב-15% ולהגדיל את תדירות ההשקיה.</div></div>
+          </div>
+          <div class="cinput">
+            <div class="field"><span id="typeTxt"></span><span class="caret" id="caret"></span></div>
+            <span class="send"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></span>
+          </div>
+        </div>
+
+        <div class="screen" id="scrB" style="opacity:0;visibility:hidden">
+          <div class="chead group">
+            <div class="pt"><span class="av av-eli"><svg viewBox="0 0 24 24"><path d="M5 11h14l-2-1.2c-.4-3-2.3-4.8-5-4.8s-4.6 1.8-5 4.8z" fill="#fff"/><circle cx="12" cy="14.5" r="3" fill="#fff"/><path d="M6 22c.6-3 3-4.6 6-4.6s5.4 1.6 6 4.6z" fill="#fff"/></svg></span><span>אלי</span></div>
+            <div class="pt"><span class="av av-adv"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" fill="#fff"/><path d="M4.5 21c.8-4 3.8-6.2 7.5-6.2s6.7 2.2 7.5 6.2z" fill="#fff"/></svg></span><span>המדריך</span></div>
+            <div class="pt"><span class="av av-as"><svg viewBox="0 0 24 24"><path d="M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11z" fill="#fff"/></svg></span><span>העוזר האישי שלך</span></div>
+          </div>
+          <div class="handoff">
+            <div class="hline" id="hline"></div>
+            <div class="card" id="card1"><span class="d" style="background:#C9902A"></span><span><b>המים:</b> המליחות עלתה</span></div>
+            <div class="card" id="card2"><span class="d" style="background:#1F7A8C"></span><span><b>הדישון:</b> הופחת</span></div>
+          </div>
+          <div class="msgs">
+            <div class="msg out" data-at="41.4"><div class="bub photo">
+              <svg viewBox="0 0 120 84" aria-hidden="true"><rect width="120" height="84" fill="#DCD2B8"/><rect width="120" height="34" fill="#E8ECE0"/><path d="M60 82 C 59 66, 61 54, 60 40" stroke="#5E8C4E" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M60 66 C 42 50, 18 52, 8 62 C 26 74, 46 72, 60 68Z" fill="#7EA35C"/><path d="M60 60 C 78 44, 102 44, 112 54 C 96 68, 74 66, 60 62Z" fill="#6E9A55"/><path d="M60 46 C 52 30, 54 18, 60 12 C 67 22, 66 36, 60 46Z" fill="#8DBE6E"/></svg>
+              <span>תסתכל על זה.</span>
+            </div></div>
+          </div>
+          <div class="cinput">
+            <div class="field"></div>
+            <span class="send"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="week" id="week">
+        <div class="wrow" id="wr1">
+          <div class="wlabel">היום</div>
+          <div class="wcells">
+            <div class="wc"><span class="t">ראשון</span></div>
+            <div class="wc"><span class="t">שני</span></div>
+            <div class="wc"><span class="t">שלישי</span></div>
+            <div class="wc"><span class="t">רביעי</span></div>
+            <div class="wc"><span class="hl" id="hl1"></span><span class="t">חמישי</span><div class="mark m-today" id="mk1">אלי יודע</div></div>
+          </div>
+        </div>
+        <div class="wrow" id="wr2">
+          <div class="wlabel">עם השירות</div>
+          <div class="wcells">
+            <div class="wc"><span class="hl" id="hl2"></span><span class="t">ראשון</span><div class="mark m-svc" id="mk2">אלי יודע</div></div>
+            <div class="wc"><span class="t">שני</span></div>
+            <div class="wc"><span class="t">שלישי</span></div>
+            <div class="wc"><span class="t">רביעי</span></div>
+            <div class="wc"><span class="t">חמישי</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== מסך סיום ===== -->
+    <div class="end" id="end">
+      <svg class="motif" viewBox="0 0 220 24" aria-hidden="true"><path d="M6 12 H214" stroke="#1F7A8C" stroke-width="4" stroke-linecap="round"/><circle cx="214" cy="12" r="7" fill="#1F7A8C"/></svg>
+      <h2>העוזר האישי שלך</h2>
+      <p>שירות שמכיר את המשק שלך ופונה אליך מראש, בליווי המדריך.</p>
+      <div class="min" id="ministryLine"></div>
+      <button class="btn-replay" id="btnReplay" type="button" aria-label="צפייה חוזרת" tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>
+        <span>צפייה חוזרת</span>
+      </button>
+    </div>
+
+    <!-- ===== מסך פתיחה ===== -->
+    <div class="start" id="start">
+      <svg class="motif" viewBox="0 0 220 24" aria-hidden="true"><path d="M6 12 H214" stroke="#7B8780" stroke-width="4" stroke-linecap="round"/><circle cx="6" cy="12" r="7" fill="#1F7A8C"/></svg>
+      <h1>העוזר האישי שלך</h1>
+      <button class="btn-start" id="btnStart" type="button" aria-label="הפעלה">
+        <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z" fill="#fff"/></svg>
+      </button>
+    </div>
+
+    <div class="concept">הדגמת קונספט</div>
+  </div>
+
+  <!-- ===== בקרי נגן ===== -->
+  <div class="controls" dir="ltr">
+    <button class="cbtn" id="btnPlay" type="button" aria-label="הפעלה">
+      <svg id="icoPlay" viewBox="0 0 24 24"><path d="M7 4.5l12 7.5-12 7.5z" fill="currentColor"/></svg>
+      <svg id="icoPause" viewBox="0 0 24 24" style="display:none"><rect x="6" y="4.5" width="4" height="15" rx="1" fill="currentColor"/><rect x="14" y="4.5" width="4" height="15" rx="1" fill="currentColor"/></svg>
+    </button>
+    <button class="cbtn" id="btnRestart" type="button" aria-label="התחלה מחדש">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>
+    </button>
+    <input type="range" id="seek" min="0" max="56000" step="10" value="0" aria-label="מיקום בסרטון">
+    <span id="time" aria-hidden="true">0:00 / 0:56</span>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ===== הגדרות ===== */
+const CONFIG = {
+  ministry: "משרד החקלאות"   // ריק ("") = גרסה בלי מיתוג: השורה "שירות של ..." לא מופיעה במסך הסיום
+};
+
+/* ===== ציר הזמן המרכזי (שניות) ===== */
+const DUR = 56;
+const SCENES = [
+  {n:1, start:0,    end:4.5},   // הקשר
+  {n:2, start:4.5,  end:10},    // הבעיה: המליחות עולה
+  {n:3, start:10,   end:15.5},  // הבעיה: מגלים מאוחר
+  {n:4, start:15.5, end:19},    // המפנה (Rewind)
+  {n:5, start:19,   end:30},    // השירות פונה ראשון
+  {n:6, start:30,   end:39},    // אלי שואל
+  {n:7, start:39,   end:46},    // המדריך בתמונה
+  {n:8, start:46,   end:52},    // השינוי
+  {n:9, start:52,   end:56}     // סיום
+];
+const S = n => SCENES[n-1].start;
+
+/* ===== עזרים ===== */
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const clamp = (v,a=0,b=1) => v<a?a:(v>b?b:v);
+const lerp = (a,b,k) => a+(b-a)*k;
+const eio = k => k<.5 ? 4*k*k*k : 1-Math.pow(-2*k+2,3)/2;
+const eo = k => 1-Math.pow(1-k,3);
+const eob = k => { const c1=1.4, c3=c1+1; return 1 + c3*Math.pow(k-1,3) + c1*Math.pow(k-1,2); };
+
+const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mq.matches;
+
+function rp(t,a,b){ if(RM) return t>=a?1:0; return clamp((t-a)/(b-a)); }
+function win(t,a,b,fi,fo){ fi=fi||.4; fo=fo||.4; if(t<a||t>=b) return 0; if(RM) return 1; return Math.min(clamp((t-a)/fi), clamp((b-t)/fo)); }
+
+function setO(el,v){ v=Math.round(v*1000)/1000; if(el._o===v) return; el._o=v; el.style.opacity=v; el.style.visibility = v<=0 ? 'hidden' : 'visible'; }
+function setT(el,s){ if(el._t===s) return; el._t=s; el.style.transform=s; }
+function setA(el,n,v){ const k='_a_'+n; if(el[k]===v) return; el[k]=v; el.setAttribute(n,v); }
+function mk(tag,attrs,parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
+function hex(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
+function mix(a,b,k){ const A=hex(a),B=hex(b); return 'rgb('+Math.round(lerp(A[0],B[0],k))+','+Math.round(lerp(A[1],B[1],k))+','+Math.round(lerp(A[2],B[2],k))+')'; }
+const f1 = v => (Math.round(v*10)/10);
+
+/* ===== בניית השדה ===== */
+const cabG=$('cabbages'), cabOuter=[];
+[368,412].forEach(y=>{
+  for(let k=0;k<6;k++){
+    const x=495+39*k;
+    const g=mk('g',{transform:'translate('+x+' '+y+')'},cabG);
+    mk('ellipse',{cx:0,cy:13,rx:18,ry:5,fill:'#1E2722',opacity:.08},g);
+    cabOuter.push(mk('circle',{r:16,fill:'#78A35E'},g));
+    mk('circle',{r:10,fill:'#A9CB8C'},g);
+    mk('path',{d:'M-6 -1 Q0 -7 6 -1',stroke:'#78A35E','stroke-width':2,fill:'none','stroke-linecap':'round'},g);
+  }
+});
+function banana(parent,x,y,s,back){
+  const g=mk('g',{transform:'translate('+x+' '+y+') scale('+s+')'},parent);
+  mk('ellipse',{cx:0,cy:3,rx:20,ry:5,fill:'#1E2722',opacity:.08},g);
+  mk('path',{d:'M-5 0 L-4 -50 L4 -50 L5 0Z',fill:back?'#A9B888':'#8FA36A'},g);
+  const L=[['M0 -50 Q-36 -74 -56 -54 Q-28 -52 0 -47Z','#5E8C4E','#8FAE7C'],
+           ['M0 -50 Q36 -78 58 -60 Q30 -56 0 -47Z','#6A9752','#97B683'],
+           ['M0 -52 Q-24 -96 -40 -92 Q-22 -70 -2 -50Z','#6E9A55','#9AB986'],
+           ['M0 -50 Q-10 -92 6 -104 Q12 -76 3 -50Z','#77A35C','#A2C08D']];
+  L.forEach(l=>mk('path',{d:l[0],fill:back?l[2]:l[1]},g));
+}
+[791,853,915].forEach(x=>banana($('bananaBack'),x,405,.78,true));
+[760,822,884,946].forEach(x=>banana($('bananaFront'),x,440,1,false));
+
+const emG=$('emitters'), depG=$('deposits'), grG=$('grains'), puG=$('pulses');
+const deposits=[], grains=[], pulses=[];
+for(let k=0;k<15;k++){
+  const x=470+36*k;
+  mk('circle',{cx:x,cy:446,r:2.6,fill:'#56605A'},emG);
+  deposits.push(mk('ellipse',{cx:x,cy:453,rx:2,ry:2.2,fill:'#C9902A',opacity:0},depG));
+}
+for(let i=0;i<16;i++) grains.push(mk('circle',{cx:460,cy:446,r:3.6,fill:'#C9902A',opacity:0},grG));
+for(let j=0;j<3;j++) pulses.push(mk('circle',{cx:0,cy:0,r:5,fill:'#1F7A8C',stroke:'#F6F4EE','stroke-width':2,opacity:0},puG));
+
+/* ===== הפניות לאלמנטים ===== */
+const E = {
+  stage:$('stage'), app:$('app'),
+  hillsFar:$('hillsFar'), hillsNear:$('hillsNear'), field:$('field'),
+  hlC:$('hlC'), hlB:$('hlB'), dripGlow:$('dripGlow'), drip:$('drip'),
+  inset:$('inset'), old1:$('old1'), old2:$('old2'),
+  route:$('route'), hHand:$('hHand'), mHand:$('mHand'), hop:$('hop'),
+  eli:$('eli'), legB:$('legB'), legF:$('legF'), armB:$('armB'), armU:$('armU'), armF:$('armF'),
+  phone:$('phone'), phoneScreen:$('phoneScreen'),
+  info:$('info'), srcLines:Array.from($('srcLines').children),
+  photo:$('photo'), streaks:$('streaks'), streakRects:Array.from($('streaks').children), flash:$('flash'),
+  badge:$('badge'), dayTxt:$('dayTxt'), rwIcon:$('rwIcon'),
+  routeChips:[$('r1'),$('r2'),$('r3')], clockChip:$('r4'),
+  srcChips:[$('sA'),$('sB'),$('sC')],
+  tagC:$('tagC'), tagB:$('tagB'),
+  caps:Array.from(document.querySelectorAll('.cap')).map(el=>({el,a:+el.dataset.a,b:+el.dataset.b})),
+  chat:$('chat'), scrA:$('scrA'), scrB:$('scrB'),
+  msgs:Array.from(document.querySelectorAll('.msg')).map(el=>({el,at:+el.dataset.at,until:el.dataset.until?+el.dataset.until:Infinity,on:false})),
+  typeTxt:$('typeTxt'), caret:$('caret'),
+  hline:$('hline'), cards:[$('card1'),$('card2')],
+  week:$('week'), wr1:$('wr1'), wr2:$('wr2'), mk1:$('mk1'), mk2:$('mk2'), hl1:$('hl1'), hl2:$('hl2'),
+  end:$('end'), endKids:Array.from($('end').children), btnReplay:$('btnReplay'), ministryLine:$('ministryLine'),
+  start:$('start'), btnStart:$('btnStart'),
+  btnPlay:$('btnPlay'), icoPlay:$('icoPlay'), icoPause:$('icoPause'), btnRestart:$('btnRestart'),
+  seek:$('seek'), time:$('time')
+};
+const tagParts = el => ({bg:el.querySelector('.tbg'), ts:Array.from(el.querySelectorAll(':scope > .ts'))});
+const TC = tagParts(E.tagC), TB = tagParts(E.tagB);
+
+/* שורת משרד במסך הסיום */
+const ministry = (CONFIG.ministry||'').trim();
+if(ministry){ E.ministryLine.textContent = 'שירות של ' + ministry; }
+else { E.ministryLine.remove(); E.endKids = Array.from(E.end.children); }
+
+/* ===== נתוני הסצנות ===== */
+const DAYS = ['ראשון','שני','שלישי','רביעי','חמישי'];
+// [זמן, אינדקס יום]
+const DAYSEQ = [[0,0],[5.5,1],[7.0,2],[8.5,3],[10.0,4],
+                [15.9,3],[16.25,2],[16.6,1],[16.95,0],
+                [39.0,1],[39.15,2],[39.3,3],[39.45,4]];
+const TYPE_TEXT = 'בכמה להקטין את הדישון? תפרט לי לפי החלקות.';
+const PHONE_PINGS = [20.6, 24.6, 33.7, 41.5];
+
+/* זרימת המים ("זמן זרימה"): מתקדם, חוזר לאחור במפנה, ושוב מתקדם */
+function flowF(t){
+  if(t<S(2)) return 0;
+  if(t<S(4)) return t-S(2);                                  // 0..11
+  if(t<17.3) return 11*(1-eio(clamp((t-S(4))/1.8)));         // Rewind
+  if(t<S(5)) return 0;
+  return 11+(t-S(5));
+}
+/* נקודה על קו המידע (קו + עקומה) */
+function infoPt(f){
+  const L1=516, L2=125, s=f*(L1+L2);
+  if(s<L1) return [978-s,446];
+  const u=(s-L1)/L2, v=1-u;
+  return [v*v*462+2*v*u*418+u*u*417, v*v*446+2*v*u*446+u*u*335];
+}
+function armPts(th1,th2){
+  const r=Math.PI/180, sx=16, sy=-128;
+  const ex=sx-28*Math.sin(th1*r), ey=sy+28*Math.cos(th1*r);
+  const a=(th1+th2)*r;
+  return [ex,ey,ex-26*Math.sin(a),ey+26*Math.cos(a)];
+}
+
+let isPortrait=false, lastDay=-1, lastType=null, lastTint=-1, lastLeaf=-1;
+
+/* ===== רינדור: הכול נגזר מזמן הניגון ===== */
+function render(t){
+  /* --- סצנה 1: Parallax והליכה --- */
+  const p1 = RM ? 1 : eo(clamp(t/4.5));
+  setA(E.hillsFar,'transform','translate('+f1((1-p1)*18)+' 0)');
+  setA(E.hillsNear,'transform','translate('+f1((1-p1)*36)+' 0)');
+  setA(E.field,'transform','translate('+f1((1-p1)*12)+' 0)');
+
+  let ex = 380, wa = 0;
+  if(!RM && t<3.4){ const k=t/3.4; ex = lerp(-80,380,1-(1-k)*(1-k)); }
+  if(!RM){ wa = t<3.0 ? 1 : clamp((3.4-t)/0.4); }
+  const sw = Math.sin(t*9.5)*24*wa;
+  const bob = -Math.abs(Math.sin(t*9.5))*2.5*wa;
+  setA(E.eli,'transform','translate('+f1(ex)+' '+f1(460+bob)+')');
+  const r=Math.PI/180;
+  setA(E.legF,'x2',f1(7-66*Math.sin(sw*r)));  setA(E.legF,'y2',f1(-68+66*Math.cos(sw*r)));
+  setA(E.legB,'x2',f1(-7+66*Math.sin(sw*r))); setA(E.legB,'y2',f1(-68+66*Math.cos(sw*r)));
+  setA(E.armB,'x2',f1(-12+50*Math.sin(sw*.7*r))); setA(E.armB,'y2',f1(-126+50*Math.cos(sw*.7*r)));
+
+  const lookK = Math.max(
+    rp(t,12.0,12.5)*(1-rp(t,15.7,16.2)),
+    rp(t,19.5,20.0)*(1-rp(t,39.3,39.8)),
+    rp(t,41.3,41.8)*(1-rp(t,45.8,46.2)));
+  const aimK = rp(t,39.4,40.1)*(1-rp(t,41.3,41.8));
+  const th1 = lerp(lerp(8-sw*.6,-25,lookK),-70,aimK);
+  const th2 = lerp(lerp(0,-135,lookK),0,aimK);
+  const ap = armPts(th1,th2);
+  setA(E.armU,'x2',f1(ap[0])); setA(E.armU,'y2',f1(ap[1]));
+  setA(E.armF,'x1',f1(ap[0])); setA(E.armF,'y1',f1(ap[1]));
+  setA(E.armF,'x2',f1(ap[2])); setA(E.armF,'y2',f1(ap[3]));
+  setA(E.phone,'transform','translate('+f1(ap[2])+' '+f1(ap[3])+')');
+  setO(E.phone, Math.max(lookK,aimK));
+  let ping=0;
+  if(!RM){ for(const p of PHONE_PINGS){ if(t>=p) ping=Math.max(ping,Math.exp(-(t-p)*2.5)); } }
+  setO(E.phoneScreen, .35+.65*ping);
+  const phX = ex+ap[2], phY = 460+bob+ap[3];
+
+  /* --- סצנה 2: קו הטפטוף והגרגירים --- */
+  const H = rp(t,4.6,5.3)*(1-rp(t,10.6,11.3));
+  setO(E.dripGlow, .12*H);
+  setA(E.drip,'stroke-width', f1(4+2*H));
+  const F = flowF(t);
+  let G = 0;
+  if(t>=S(2) && t<S(4)) G = rp(t,4.6,5.2);
+  else if(t>=S(4) && t<17.3) G = 1-rp(t,16.8,17.3);
+  else if(t>=S(5)) G = rp(t,19.0,19.6)*(1-rp(t,45.6,46.2));
+  for(let i=0;i<grains.length;i++){
+    const g=grains[i];
+    const x = RM ? 460+i*33 : 452+(((F*85+i*33)%526)+526)%526;
+    setA(g,'cx',f1(x));
+    setA(g,'cy',f1(446+(RM?0:Math.sin(F*3+i)*1.2)));
+    setO(g,G);
+  }
+  const D = t<S(5) ? clamp((F-1)/7) : 0;
+  for(const d of deposits){ setA(d,'rx',f1(2+4.5*D)); setO(d,D*.9); }
+
+  /* --- סצנות 2–4: היום בפינה --- */
+  let di=0, dAt=0;
+  for(const s of DAYSEQ){ if(t>=s[0]){ di=s[1]; dAt=s[0]; } }
+  if(di!==lastDay){ lastDay=di; E.dayTxt.textContent='יום '+DAYS[di]; }
+  const dp = rp(t,dAt,dAt+.25);
+  setO(E.dayTxt, dAt===0 ? 1 : .25+.75*dp);
+  setT(E.dayTxt, 'translateY('+f1((1-dp)*-6)+'px)');
+  setO(E.badge, 1-rp(t,45.7,46.1));
+  const rwv = win(t,S(4),17.3,.15,.3);
+  E.rwIcon.classList.toggle('on', rwv>0);
+  setO(E.rwIcon, rwv);
+
+  /* --- סצנה 3: התקריב והחיפוש --- */
+  const I = rp(t,10.0,10.6)*(1-rp(t,16.7,17.3));
+  const isc = .6+.4*eo(I);
+  setA(E.inset,'transform','translate(720 190) scale('+isc.toFixed(3)+') translate(-720 -190)');
+  setO(E.inset,I);
+  const L = rp(t,10.8,12.8)*(1-rp(t,15.6,16.9));
+  const lq = Math.round(L*100)/100;
+  if(lq!==lastLeaf){ lastLeaf=lq; const c=mix('#6E9A55','#D9AE45',lq); E.old1.setAttribute('fill',c); E.old2.setAttribute('fill',c); }
+  const tint = Math.round(L*45)/100;
+  if(tint!==lastTint){ lastTint=tint; const c=mix('#78A35E','#C9A33E',tint); cabOuter.forEach(o=>o.setAttribute('fill',c)); }
+
+  const R = rp(t,12.2,12.7)*(1-rp(t,15.6,16.2));
+  setO(E.route,R);
+  E.routeChips.forEach((c,j)=>{ const o=win(t,12.35+.15*j,16.2,.3,.5); setO(c,o); setT(c,'translate(-50%,-50%) scale('+(.9+.1*o).toFixed(3)+')'); });
+  { const o=win(t,12.8,16.2,.3,.5); setO(E.clockChip,o); setT(E.clockChip,'translate(-50%,-50%) scale('+(.9+.1*o).toFixed(3)+')'); }
+  const ct = RM ? 0 : Math.max(0,t-12.2);
+  setA(E.mHand,'transform','rotate('+f1(ct*300)+' 180 205)');
+  setA(E.hHand,'transform','rotate('+f1(ct*40)+' 180 205)');
+  {
+    const angs=[-90,30,150];
+    let ang=-90, bump=0;
+    if(!RM && t>=12.8){
+      const q=(t-12.8)/0.8, k=Math.floor(q), fr=q-k;
+      const mv=eio(clamp(fr/.6));
+      ang = angs[k%3] + 120*mv;
+      bump = Math.sin(Math.PI*mv)*16;
+    }
+    const rr=(92+bump), ar=ang*r;
+    setA(E.hop,'cx',f1(180+rr*Math.cos(ar)));
+    setA(E.hop,'cy',f1(205+rr*Math.sin(ar)));
+  }
+
+  /* --- סצנה 4: Rewind --- */
+  if(!RM && t>=S(4) && t<17.2){
+    const k=(t-S(4))/1.7;
+    E.streakRects.forEach((s,j)=>setA(s,'x',f1(lerp(-260,1060,((k*1.3+j*.27)%1)))));
+    setO(E.streaks, win(t,S(4),17.2,.2,.4));
+  } else setO(E.streaks,0);
+
+  /* --- סצנה 5: קו המידע והמקורות --- */
+  const T5 = eio(rp(t,19.0,20.4));
+  setA(E.info,'stroke-dashoffset',(1-T5).toFixed(4));
+  const infoO = win(t,S(5),39.4,.05,.5)*(1-.45*rp(t,30,30.8));
+  setO(E.info,infoO);
+  for(let j=0;j<3;j++){
+    const p=pulses[j];
+    if(!RM && T5>=1 && t<39.2){
+      const f=(((t-20.4)*.32+j/3)%1+1)%1;
+      const pt=infoPt(f);
+      setA(p,'cx',f1(pt[0])); setA(p,'cy',f1(pt[1]));
+      setO(p, infoO*Math.min(1,f*6,(1-f)*6));
+    } else setO(p,0);
+  }
+  E.srcLines.forEach((l,j)=>{
+    const d=eio(rp(t,19.5+.25*j,20.7+.25*j));
+    setA(l,'stroke-dashoffset',(1-d).toFixed(4));
+    setO(l, win(t,19.4+.2*j,30.4,.2,.5)*.85);
+  });
+  E.srcChips.forEach((c,j)=>{ const o=win(t,19.3+.2*j,30.4,.35,.5); setO(c,o); setT(c,'translate(-50%,-50%) scale('+(.92+.08*o).toFixed(3)+')'); });
+
+  /* --- סצנה 6: החלקות והתגיות --- */
+  setO(E.hlC, win(t,34.2,39.3,.5,.5));
+  setO(E.hlB, win(t,34.6,39.3,.5,.5));
+  fillTag(E.tagC,TC,t,34.4);
+  fillTag(E.tagB,TB,t,34.9);
+
+  /* --- סצנה 7: צילום --- */
+  const fl = (!RM && t>=40.3 && t<40.9) ? Math.sin(Math.PI*(t-40.3)/.6)*.22 : 0;
+  setO(E.flash,fl);
+  const pk = eio(rp(t,40.6,41.4));
+  const pv = win(t,40.5,41.5,.1,.15);
+  setA(E.photo,'transform','translate('+f1(lerp(520,phX,pk))+' '+f1(lerp(368,phY,pk))+') scale('+lerp(1.3,.35,pk).toFixed(3)+')');
+  setO(E.photo,pv);
+
+  /* --- צ'אט (סצנות 5–7) --- */
+  const K = win(t,19.1,46.2,.6,.5);
+  setO(E.chat,K);
+  const ke = eo(K);
+  setT(E.chat, isPortrait ? 'translateY('+f1((1-ke)*16)+'px)' : 'translateX('+f1(-(1-ke)*24)+'px)');
+  const bk = rp(t,39.0,39.4);
+  setO(E.scrA,1-bk); setO(E.scrB,bk);
+  for(const m of E.msgs){
+    const on = t>=m.at && t<m.until;
+    if(on!==m.on){ m.on=on; m.el.classList.toggle('on',on); }
+    if(on){
+      const p = RM ? 1 : clamp((t-m.at)/.35);
+      setO(m.el,p);
+      setT(m.el,'translateY('+f1((1-eo(p))*10)+'px)');
+    }
+  }
+  let typed='';
+  if(t>=30.4 && t<32.8){
+    typed = (RM || t>=32.6) ? TYPE_TEXT : TYPE_TEXT.slice(0, Math.round(TYPE_TEXT.length*clamp((t-30.4)/2.2)));
+  }
+  if(typed!==lastType){ lastType=typed; E.typeTxt.textContent=typed; }
+  setO(E.caret, (t>=30.25 && t<32.8) ? 1 : 0);
+
+  setO(E.hline, rp(t,42.2,42.5));
+  E.cards.forEach((c,j)=>{
+    const a=42.2+.6*j;
+    const p=eio(rp(t,a,a+.8));
+    setO(c, rp(t,a,a+.3));
+    setT(c,'translateX('+f1(-(1-p)*45)+'%)');
+  });
+
+  /* --- סצנה 8: השבוע --- */
+  setO(E.week, win(t,45.9,52.3,.6,.45));
+  setO(E.wr1, rp(t,46.2,46.6));
+  setO(E.wr2, rp(t,46.5,46.9));
+  markLand(E.mk1,E.hl1,t,46.9);
+  markLand(E.mk2,E.hl2,t,47.6);
+
+  /* --- סצנה 9: סיום --- */
+  const EE = rp(t,52.0,52.8);
+  setO(E.end,EE);
+  E.endKids.forEach((c,j)=>{
+    const p = rp(t,52.3+.35*j,52.9+.35*j);
+    setO(c,p);
+    setT(c,'translateY('+f1((1-eo(p))*8)+'px)');
+  });
+  const rv = E.btnReplay._o>0.5;
+  if(E.btnReplay._en!==rv){ E.btnReplay._en=rv; E.btnReplay.tabIndex = rv?0:-1; E.btnReplay.style.pointerEvents = rv?'auto':'none'; }
+
+  /* --- כתוביות --- */
+  for(const c of E.caps){
+    const o=win(t,c.a,c.b,.35,.35);
+    setO(c.el,o);
+    setT(c.el,'translateY(calc(-50% + '+f1((1-eo(o))*6)+'px))');
+  }
+}
+
+function fillTag(el,P,t,a){
+  setO(el, win(t,a,39.3,.3,.4));
+  setT(P.bg,'scaleX('+eo(rp(t,a,a+.5)).toFixed(3)+')');
+  P.ts.forEach((s,i)=>setO(s, rp(t,a+.25+.15*i,a+.45+.15*i)));
+}
+function markLand(mk,hl,t,a){
+  const p=rp(t,a,a+.7);
+  setO(mk, rp(t,a,a+.25));
+  setT(mk,'translate(-50%,'+f1(-(1-eob(p))*24)+'px)');
+  setO(hl, rp(t,a+.4,a+.8));
+}
+
+/* ===== נגן ===== */
+let t=0, playing=false, started=false, last=0, scrubbing=false, lastSec=-1;
+const fmt = s => Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+
+function updateUI(){
+  if(!scrubbing) E.seek.value = Math.round(t*1000);
+  const sec = Math.floor(t);
+  if(sec!==lastSec){
+    lastSec=sec;
+    E.time.textContent = fmt(t)+' / '+fmt(DUR);
+    E.seek.setAttribute('aria-valuetext', fmt(t)+' מתוך '+fmt(DUR));
+  }
+  E.icoPlay.style.display = playing?'none':'block';
+  E.icoPause.style.display = playing?'block':'none';
+  E.btnPlay.setAttribute('aria-label', playing?'השהיה':(t>=DUR?'צפייה חוזרת':'הפעלה'));
+}
+function loop(ts){
+  if(!playing) return;
+  let dt=(ts-last)/1000; last=ts;
+  if(dt>.25) dt=.25; if(dt<0) dt=0;
+  t=Math.min(DUR,t+dt);
+  if(t>=DUR){ t=DUR; playing=false; }
+  render(t); updateUI();
+  if(playing) requestAnimationFrame(loop);
+}
+function hideStart(){ if(!started){ started=true; E.start.classList.add('hidden'); } }
+function play(){
+  hideStart();
+  if(t>=DUR) t=0;
+  if(playing) return;
+  playing=true; last=performance.now();
+  updateUI();
+  requestAnimationFrame(loop);
+}
+function pause(){ playing=false; updateUI(); }
+function toggle(){ if(!started || !playing) play(); else pause(); }
+function restart(){ t=0; render(t); playing=false; play(); E.btnPlay.focus({preventScroll:true}); }
+
+E.btnStart.addEventListener('click',()=>{ play(); E.btnPlay.focus({preventScroll:true}); });
+E.btnPlay.addEventListener('click',toggle);
+E.btnRestart.addEventListener('click',restart);
+E.btnReplay.addEventListener('click',restart);
+E.seek.addEventListener('pointerdown',()=>{ scrubbing=true; });
+const endScrub=()=>{ scrubbing=false; updateUI(); };
+E.seek.addEventListener('pointerup',endScrub);
+E.seek.addEventListener('pointercancel',endScrub);
+E.seek.addEventListener('change',endScrub);
+E.seek.addEventListener('input',()=>{
+  hideStart();
+  t=clamp(E.seek.value/1000,0,DUR);
+  if(playing) last=performance.now();
+  render(t); updateUI();
+});
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space' || e.key===' '){
+    if(e.target && e.target.tagName==='BUTTON') return;   // כפתור ממוקד מטפל ברווח בעצמו
+    e.preventDefault(); toggle();
+  }
+});
+
+/* ===== פריסה ===== */
+function layout(){
+  const W=window.innerWidth, Hh=window.innerHeight, CH=56;
+  isPortrait = W < Hh*.9;
+  document.documentElement.classList.toggle('portrait',isPortrait);
+  let w,h;
+  if(isPortrait){ w=W; h=Math.max(300,Hh-CH); }
+  else {
+    const pad = (W>700 && Hh>500) ? 24 : 0;
+    w=Math.min(W-pad,(Hh-CH-pad)*16/9); h=w*9/16;
+  }
+  E.stage.style.width=w+'px'; E.stage.style.height=h+'px';
+  E.app.style.width=w+'px';
+  document.documentElement.style.setProperty('--u',(w/100)+'px');
+  E.chat._t=null;
+  render(t);
+}
+window.addEventListener('resize',layout);
+window.addEventListener('orientationchange',layout);
+const onRM = e=>{ RM=e.matches; render(t); };
+if(mq.addEventListener) mq.addEventListener('change',onRM); else if(mq.addListener) mq.addListener(onRM);
+
+layout();
+render(0);
+updateUI();
+})();
+</script>
+</body>
