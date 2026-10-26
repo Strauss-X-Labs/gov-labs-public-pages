@@ -149,11 +149,12 @@ const TEXT = {
 
   // סיום
   end_tag: "מפסולת של מפעל אחד, לחומר גלם של מפעל אחר.",
-  end_small: "Gov-Labs 2.0 · כלכלה מעגלית · משרד הכלכלה",
+  end_small: "Gov-Labs 2.0 · כלכלה מעגלית",
 
   // כפתורים
   ui_play: "הפעל", ui_pause: "השהה", ui_restart: "התחל מחדש",
-  ui_music_enable: "הפעל מוזיקה", ui_music_on: "מוזיקה", ui_music_off: "מוזיקה כבויה"
+  ui_music_enable: "הפעל מוזיקה", ui_music_on: "מוזיקה", ui_music_off: "מוזיקה כבויה",
+  ui_gate: "לחצו לצפייה", ui_gate_sub: "עם מוזיקה"
 };
 
 // ציר הזמן: כל סצנה מתחילה ב-start (בשניות) ונמשכת עד תחילת הבאה.
@@ -520,6 +521,24 @@ svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);o
 .tons-sub{font-size:42px;font-weight:700;text-align:center;margin-top:6px}
 .lf-lbl{font-size:24px;font-weight:700;color:var(--muted);text-decoration:line-through;text-decoration-color:#d35454;text-decoration-thickness:3px}
 .plus{position:absolute;left:0;top:0;font-size:30px;font-weight:900;color:var(--green);opacity:0;white-space:nowrap;direction:ltr}
+
+/* ---------- start gate (shown when the browser blocks sound) ---------- */
+.gate{position:absolute;left:0;top:0;width:var(--W,1600px);height:var(--H,900px);z-index:40;border-radius:24px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+  background:rgba(245,249,247,.7);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);transition:opacity .45s ease}
+.gate.hide{opacity:0;pointer-events:none}
+.gate-btn{width:200px;height:200px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;box-shadow:0 20px 50px rgba(31,138,91,.4);animation:gatePulse 1.8s ease-out infinite}
+.gate-btn svg{width:86px;height:86px;transform:translateX(6px)}
+@keyframes gatePulse{0%{box-shadow:0 20px 50px rgba(31,138,91,.4),0 0 0 0 rgba(31,138,91,.45)}100%{box-shadow:0 20px 50px rgba(31,138,91,.4),0 0 0 36px rgba(31,138,91,0)}}
+.gate-txt{font-size:46px;font-weight:800;color:var(--ink)}
+.gate-sub{display:flex;align-items:center;gap:10px;font-size:28px;font-weight:600;color:var(--green)}
+.gate-sub svg{width:30px;height:30px}
+.portrait .gate-btn{width:260px;height:260px}
+.portrait .gate-btn svg{width:110px;height:110px}
+.portrait .gate-txt{font-size:62px}
+.portrait .gate-sub{font-size:38px}
+.portrait .gate-sub svg{width:40px;height:40px}
+.reduced .gate-btn{animation:none}
 
 /* ---------- music button ---------- */
 .btn.music.needs{animation:needs 1.6s ease-in-out infinite}
@@ -1160,6 +1179,11 @@ svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);o
   <div class="caps" id="caps"></div>
 </div>
 
+<div class="gate hide" id="gate" role="button" aria-label="הפעלה">
+  <div class="gate-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg></div>
+  <div class="gate-txt" data-t="ui_gate"></div>
+  <div class="gate-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span data-t="ui_gate_sub"></span></div>
+</div>
 <div class="controls">
   <button class="btn primary" id="btnPlay" type="button"></button>
   <button class="btn" id="btnRestart" type="button">
@@ -1535,8 +1559,8 @@ svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);o
     btnMusic.classList.toggle("needs", needs);
     btnMusic.innerHTML = (needs || !Music.on ? ICON_MUTE : ICON_SOUND) + `<span>${needs ? TEXT.ui_music_enable : (Music.on ? TEXT.ui_music_on : TEXT.ui_music_off)}</span>`;
   }
-  function musicUnlock() {
-    if (Music.unlocked) return;
+  function musicInit() {
+    if (Music.ctx || Music.el) return;
     try {
       if (MUSIC_URL) { Music.el = new Audio(MUSIC_URL); Music.el.preload = "auto"; Music.el.volume = MUSIC_VOLUME; }
       else {
@@ -1544,10 +1568,28 @@ svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);o
         Music.ctx = new AC(); Music.eng = makeEngine(Music.ctx, Music.ctx.destination);
         Music.eng.master.gain.value = Music.on ? MUSIC_VOLUME : 0;
       }
-      Music.unlocked = true; Music.fresh = true; Music.schedTo = null;
-      setTimeout(() => Music.fresh = false, 600);
     } catch (e) { console.warn(e); }
+  }
+  // called on every user gesture: the first one unlocks sound (browsers require a gesture)
+  function musicUnlock() {
+    musicInit();
+    if (Music.ctx && Music.ctx.state !== "running" && (playing || !Music.unlocked)) Music.ctx.resume().catch(() => {});
+    if (Music.unlocked) return;
+    Music.unlocked = true; Music.fresh = true; Music.schedTo = null;
+    setTimeout(() => Music.fresh = false, 600);
     updMusicBtn();
+  }
+  // does the browser let us play sound right now, without a click?
+  function probeSound() {
+    return new Promise(res => {
+      musicInit();
+      let done = false; const fin = ok => { if (!done) { done = true; res(ok); } };
+      if (Music.el) { Music.el.play().then(() => { Music.el.pause(); fin(true); }).catch(() => fin(false)); setTimeout(() => fin(false), 800); return; }
+      if (!Music.ctx) return fin(false);
+      if (Music.ctx.state === "running") return fin(true);
+      Music.ctx.resume().then(() => fin(Music.ctx.state === "running")).catch(() => fin(false));
+      setTimeout(() => fin(Music.ctx.state === "running"), 450);
+    });
   }
   function musicSetOn(v) {
     Music.on = v;
@@ -1581,7 +1623,7 @@ svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);o
       Music.schedTo = horizon;
     }
   }
-  addEventListener("pointerdown", musicUnlock, true);
+  ["pointerdown", "pointerup", "touchend", "click", "keydown"].forEach(ev => addEventListener(ev, musicUnlock, true));
   addEventListener("keydown", musicUnlock, true);
   btnMusic.addEventListener("click", () => { musicUnlock(); if (Music.fresh) { Music.fresh = false; musicSetOn(true); } else musicSetOn(!Music.on); });
   updMusicBtn();
@@ -1714,7 +1756,12 @@ svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);o
   const btnPlay = $("#btnPlay");
   const ICON_PLAY = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>`;
   const ICON_PAUSE = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>`;
+  const gate = $("#gate");
+  const gateOpen = () => !gate.classList.contains("hide");
+  function startWithMusic() { musicUnlock(); musicSetOn(true); gate.classList.add("hide"); seek(0); setPlaying(true); }
+  gate.addEventListener("click", e => { e.stopPropagation(); startWithMusic(); });
   function setPlaying(p) {
+    if (p) gate.classList.add("hide");
     playing = p; last = null;
     stage.classList.toggle("paused", !p);
     btnPlay.innerHTML = (p ? ICON_PAUSE : ICON_PLAY) + `<span>${p ? TEXT.ui_pause : TEXT.ui_play}</span>`;
@@ -1738,7 +1785,7 @@ svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);o
     musicTick();
     requestAnimationFrame(frame);
   }
-  btnPlay.addEventListener("click", () => { if (!playing && t >= DURATION) restart(); else setPlaying(!playing); });
+  btnPlay.addEventListener("click", () => { if (gateOpen()) startWithMusic(); else if (!playing && t >= DURATION) restart(); else setPlaying(!playing); });
   $("#btnRestart").addEventListener("click", restart);
   stage.addEventListener("click", () => btnPlay.click());
   $("#bar").addEventListener("click", e => {
@@ -1763,10 +1810,16 @@ svg.full{position:absolute;inset:0;width:var(--W,1600px);height:var(--H,900px);o
   requestAnimationFrame(frame);
   if (q.has("t")) { seek(parseFloat(q.get("t")) || 0); }
   else {
-    const go = () => { if (!playing && t === 0) setPlaying(true); };
-    (document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]) : Promise.resolve()).then(go);
+    // music is on by default: start right away if the browser allows sound, otherwise show a one-tap start screen
+    const go = ok => {
+      if (playing || t !== 0) return;
+      if (ok) { Music.unlocked = true; updMusicBtn(); setPlaying(true); }
+      else { seek(3.5); gate.classList.remove("hide"); }
+    };
+    (document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]) : Promise.resolve()).then(probeSound).then(go);
   }
   window.__seek = s => { seek(s); setPlaying(false); };
+  window.__ctxState = () => Music.ctx ? Music.ctx.state : (Music.el ? "element" : "none");
 })();
 </script>
 </body>
