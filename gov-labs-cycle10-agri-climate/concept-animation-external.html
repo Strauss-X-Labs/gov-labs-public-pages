@@ -22,13 +22,16 @@ button,input{font-family:inherit}
 
 .visual{position:absolute;inset:0;z-index:1}
 .visual>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-.portrait .visual{position:relative;inset:auto;width:100%;aspect-ratio:1000/562;flex:none}
+/* במסך צר: רצועת הכתובית עולה על האדמה הריקה בתחתית האיור (16% התחתונים, כמו במסך רחב), והצ'אט עולה על החלק שמתחת לאיור */
+.portrait{--strip:calc(var(--u)*9);--capH:clamp(62px,calc(var(--u)*16),96px)}
+.portrait .visual{position:relative;inset:auto;width:100%;aspect-ratio:1000/562;flex:none;margin-bottom:calc(var(--strip)*-1)}
 
 /* ---------- כתובית ---------- */
 .caption{position:absolute;left:0;right:0;bottom:0;height:16%;z-index:5;background:rgba(246,244,238,.95);border-top:1px solid rgba(30,39,34,.07)}
 .cap{position:absolute;left:5%;right:5%;top:50%;margin:0;text-align:center;font-weight:700;font-size:max(17px,calc(var(--u)*2.4));line-height:1.3;opacity:0;visibility:hidden;transform:translateY(-50%)}
-.portrait .caption{position:relative;left:auto;right:auto;bottom:auto;height:auto;min-height:clamp(74px,calc(var(--u)*20),110px);flex:none}
+.portrait .caption{position:relative;left:auto;right:auto;bottom:auto;height:auto;min-height:var(--capH);flex:none}
 .portrait .cap{font-size:clamp(19px,calc(var(--u)*5.1),29px)}
+.portrait .cap.with-chat{top:calc(var(--strip)/2)}   /* כתובית של שורה אחת, בזמן שהצ'אט מוצג: רק על רצועת האדמה */
 
 /* ---------- שכבות HTML על האיור ---------- */
 .badge{position:absolute;top:4%;right:3%;display:flex;align-items:center;gap:.4em;background:#FBFAF7;border:1px solid rgba(30,39,34,.14);border-radius:999px;padding:.35em .9em;font-weight:700;font-size:max(12px,calc(var(--u)*1.35));line-height:1.2;box-shadow:0 2px 8px rgba(30,39,34,.06)}
@@ -51,10 +54,25 @@ button,input{font-family:inherit}
 
 /* ---------- אזור תחתון: צ'אט ושבוע ---------- */
 .lower{position:absolute;left:0;right:0;top:0;bottom:16%;z-index:4;pointer-events:none}
-.portrait .lower{position:relative;left:auto;right:auto;top:auto;bottom:auto;flex:1;min-height:0}
+.portrait .lower{position:relative;left:auto;right:auto;top:auto;bottom:auto;flex:1;min-height:0;margin-top:calc(var(--strip) - var(--capH));z-index:6}
 
 .chat{position:absolute;left:2%;top:9%;bottom:4%;width:31%;background:#FBFAF7;border:1px solid rgba(30,39,34,.10);border-radius:max(14px,calc(var(--u)*2));box-shadow:0 12px 32px rgba(30,39,34,.12);overflow:hidden;opacity:0;visibility:hidden;font-size:max(12.5px,calc(var(--u)*1.2))}
-.portrait .chat{left:12px;right:12px;top:4px;bottom:10px;width:auto;font-size:clamp(14px,calc(var(--u)*3.7),19px);border-radius:18px}
+.portrait .chat{left:8px;right:8px;top:4px;bottom:6px;width:auto;font-size:clamp(14px,calc(var(--u)*3.7),19px);border-radius:18px}
+/* במסך צר: מסגרת הצ'אט קומפקטית, כדי שרוב הגובה יישאר להודעות */
+.portrait .chead{padding:.45em .8em;gap:.5em}
+.portrait .chead .av{width:1.8em;height:1.8em}
+.portrait .msgs{padding:.55em .65em;gap:.45em}
+.portrait .msg{max-width:94%}
+.portrait .bub{padding:.5em .75em;line-height:1.4}
+.portrait .bub.photo{padding:.35em .35em .5em}
+.portrait .bub.photo svg{width:8em;height:5.6em}
+.portrait .cinput{padding:.4em .6em}
+.portrait .field{min-height:2em;padding:.3em .75em}
+.portrait .send{width:2em;height:2em}
+.portrait .call{padding:.5em .6em 0;gap:.4em}
+.portrait .tile{padding:.7em .2em .6em;gap:.35em}
+.portrait .tile .av{width:3.2em;height:3.2em}
+.portrait .tile .ring{top:.7em;width:3.2em;height:3.2em;margin-left:-1.6em}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column}
 .chead{flex:none;display:flex;align-items:center;gap:.6em;padding:.7em .9em;border-bottom:1px solid rgba(30,39,34,.08);background:#F1F0EA;font-weight:700}
 .chead.group{justify-content:space-around;gap:.2em;padding:.55em .3em}
@@ -70,6 +88,7 @@ button,input{font-family:inherit}
 .msg.on{display:block}
 .msg.in{align-self:flex-end}
 .msg.out{align-self:flex-start}
+.msg.cut .bub{visibility:hidden}
 .bub{padding:.6em .8em;border-radius:1em;line-height:1.45;font-weight:400}
 .in .bub{background:#fff;border:1px solid rgba(31,122,140,.28);border-bottom-left-radius:.3em}
 .out .bub{background:#E2E9DD;border-bottom-right-radius:.3em}
@@ -97,7 +116,7 @@ button,input{font-family:inherit}
 
 /* שבוע */
 .week{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6%;background:var(--bg);opacity:0;visibility:hidden;padding:3% 7%;font-size:max(13px,calc(var(--u)*1.55))}
-.portrait .week{font-size:clamp(13px,calc(var(--u)*3.6),19px);padding:12px 14px;gap:22px}
+.portrait .week{top:calc(var(--capH) - var(--strip));font-size:clamp(13px,calc(var(--u)*3.6),19px);padding:12px 14px;gap:22px}
 .wrow{width:min(100%,46em);display:grid;grid-template-columns:7.2em 1fr;align-items:end;gap:1em;opacity:0}
 .portrait .wrow{grid-template-columns:1fr;gap:.2em}
 .wlabel{font-weight:700;padding-bottom:.55em}
@@ -135,11 +154,12 @@ button,input{font-family:inherit}
 .start.hidden{display:none}
 
 .concept{position:absolute;top:2.2%;left:1.6%;z-index:20;font-size:max(11px,calc(var(--u)*1.0));background:rgba(30,39,34,.8);color:#fff;border-radius:999px;padding:.25em .75em;font-weight:700;line-height:1.3;pointer-events:none}
-.portrait .concept{top:calc(100vw * 0.562 - 26px);left:8px;font-size:11px}
+.portrait .concept{top:calc(var(--u)*47.2 - 26px);left:8px;font-size:11px}
 .num{display:inline-block;direction:ltr;unicode-bidi:isolate}
 
 /* ---------- בקרים ---------- */
 .controls{display:flex;align-items:center;gap:8px;height:56px;padding:0 8px}
+.portrait .controls{height:48px}
 .cbtn{width:44px;height:44px;border-radius:50%;border:none;background:transparent;color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}
 .cbtn:hover{background:rgba(30,39,34,.06)}
 .cbtn svg{width:22px;height:22px}
@@ -288,9 +308,10 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-o
       <p class="cap" data-a="4.7" data-b="10">המליחות במי ההשקיה עולה. אף אחד לא מודיע לו.</p>
       <p class="cap" data-a="10.2" data-b="15.5">הוא מגלה רק כשהעלים מצהיבים. ואז מתחיל לחפש.</p>
       <p class="cap" data-a="15.7" data-b="19">אותו שבוע. הפעם, המידע מגיע קודם.</p>
-      <p class="cap" data-a="20.8" data-b="30">בלי להזין נתונים.</p>
+      <!-- with-chat: מוצגת יחד עם הצ'אט. במסך צר יש לה שורה אחת בלבד -->
+      <p class="cap with-chat" data-a="20.8" data-b="30">בלי להזין נתונים.</p>
       <p class="cap" data-a="39.4" data-b="44.4">אותו שבוע. אותם מים. ההבדל: מתי אלי יודע.</p>
-      <p class="cap" data-a="56.6" data-b="60.4">שיחת ועידה: מסכמים שאין פה באמת בעיה.</p>
+      <p class="cap with-chat" data-a="56.6" data-b="60.4">שיחת ועידה: מסכמים שאין פה באמת בעיה.</p>
     </div>
 
     <!-- ===== צ'אט ושבוע ===== -->
@@ -507,7 +528,7 @@ const E = {
   routeChips:[$('r1'),$('r2'),$('r3')], clockChip:$('r4'),
   srcChips:[$('sA'),$('sB'),$('sC')],
   tagC:$('tagC'), tagB:$('tagB'),
-  caps:Array.from(document.querySelectorAll('.cap')).map(el=>({el,a:+el.dataset.a,b:+el.dataset.b})),
+  caption:$('caption'), caps:Array.from(document.querySelectorAll('.cap')).map(el=>({el,a:+el.dataset.a,b:+el.dataset.b})),
   chat:$('chat'), scrA:$('scrA'), scrB:$('scrB'),
   msgs:Array.from(document.querySelectorAll('.msg')).map(el=>({el,at:+el.dataset.at,until:el.dataset.until?+el.dataset.until:Infinity,on:false})),
   typeTxt:$('typeTxt'), caret:$('caret'),
@@ -557,7 +578,17 @@ function armPts(th1,th2){
   return [ex,ey,ex-26*Math.sin(a),ey+26*Math.cos(a)];
 }
 
-let isPortrait=false, lastDay=-1, lastType=null, lastTint=-1, lastLeaf=-1;
+let isPortrait=false, lastDay=-1, lastType=null, lastTint=-1, lastLeaf=-1, lastBand=-1, fitDirty=true;
+
+/* הודעה ישנה שכבר לא נכנסת במלואה בחלון הצ'אט מוסתרת כולה, כדי שלא תוצג חתוכה (מסכים נמוכים) */
+const msgBoxes = Array.from(document.querySelectorAll('.msgs'));
+function fitMsgs(){
+  for(const box of msgBoxes){
+    const top = box.getBoundingClientRect().top + parseFloat(getComputedStyle(box).paddingTop) - .5;
+    const on = box.querySelectorAll('.msg.on');
+    on.forEach((el,i)=>el.classList.toggle('cut', i<on.length-1 && el.getBoundingClientRect().top<top));
+  }
+}
 
 /* ===== רינדור: הכול נגזר מזמן הניגון ===== */
 function render(t){
@@ -712,7 +743,7 @@ function render(t){
   setO(E.scrA,1-bk); setO(E.scrB,bk);
   for(const m of E.msgs){
     const on = t>=m.at && t<m.until;
-    if(on!==m.on){ m.on=on; m.el.classList.toggle('on',on); }
+    if(on!==m.on){ m.on=on; m.el.classList.toggle('on',on); fitDirty=true; }
     if(on){
       const p = RM ? 1 : clamp((t-m.at)/.35);
       setO(m.el,p);
@@ -723,8 +754,9 @@ function render(t){
   if(t>=30.4 && t<32.8){
     typed = (RM || t>=32.6) ? TYPE_TEXT : TYPE_TEXT.slice(0, Math.round(TYPE_TEXT.length*clamp((t-30.4)/2.2)));
   }
-  if(typed!==lastType){ lastType=typed; E.typeTxt.textContent=typed; }
+  if(typed!==lastType){ lastType=typed; E.typeTxt.textContent=typed; fitDirty=true; }   // שדה ההקלדה גדל ומקטין את חלון ההודעות
   setO(E.caret, (t>=30.25 && t<32.8) ? 1 : 0);
+  if(fitDirty){ fitDirty=false; fitMsgs(); }
 
   /* --- סצנה 9: שיחת הוועידה. הדמויות מצטרפות, וטבעת מסמנת מי מדבר --- */
   E.tiles.forEach((c,j)=>{
@@ -758,11 +790,16 @@ function render(t){
   if(E.btnReplay._en!==rv){ E.btnReplay._en=rv; E.btnReplay.tabIndex = rv?0:-1; E.btnReplay.style.pointerEvents = rv?'auto':'none'; }
 
   /* --- כתוביות --- */
+  let capV=0;
   for(const c of E.caps){
     const o=win(t,c.a,c.b,.35,.35);
     setO(c.el,o);
     setT(c.el,'translateY(calc(-50% + '+f1((1-eo(o))*6)+'px))');
+    capV=Math.max(capV,o);
   }
+  // במסך צר, כשהצ'אט מוצג: רקע הרצועה רק כשיש כתובית, כך שהאיור נגמר ממש מעל הצ'אט
+  const band = isPortrait ? Math.round(Math.max(1-K,capV)*100)/100 : 1;
+  if(band!==lastBand){ lastBand=band; E.caption.style.background='rgba(246,244,238,'+(.95*band)+')'; E.caption.style.borderTopColor='rgba(30,39,34,'+(.07*band)+')'; }
 }
 
 function fillTag(el,P,t,a){
@@ -841,8 +878,9 @@ document.addEventListener('keydown',e=>{
 
 /* ===== פריסה ===== */
 function layout(){
-  const W=window.innerWidth, Hh=window.innerHeight, CH=56;
+  const W=window.innerWidth, Hh=window.innerHeight;
   isPortrait = W < Hh*.9;
+  const CH = isPortrait ? 48 : 56;   // גובה שורת הבקרים, כמו ב-CSS
   document.documentElement.classList.toggle('portrait',isPortrait);
   let w,h;
   if(isPortrait){ w=W; h=Math.max(300,Hh-CH); }
@@ -854,6 +892,7 @@ function layout(){
   E.app.style.width=w+'px';
   document.documentElement.style.setProperty('--u',(w/100)+'px');
   E.chat._t=null;
+  fitDirty=true;
   render(t);
 }
 window.addEventListener('resize',layout);
