@@ -26,9 +26,9 @@ button,input{font-family:inherit}
 
 /* ---------- כתובית ---------- */
 .caption{position:absolute;left:0;right:0;bottom:0;height:16%;z-index:5;background:rgba(246,244,238,.95);border-top:1px solid rgba(30,39,34,.07)}
-.cap{position:absolute;left:5%;right:5%;top:50%;margin:0;text-align:center;font-weight:700;font-size:max(15px,calc(var(--u)*2.1));line-height:1.3;opacity:0;visibility:hidden;transform:translateY(-50%)}
+.cap{position:absolute;left:5%;right:5%;top:50%;margin:0;text-align:center;font-weight:700;font-size:max(17px,calc(var(--u)*2.4));line-height:1.3;opacity:0;visibility:hidden;transform:translateY(-50%)}
 .portrait .caption{position:relative;left:auto;right:auto;bottom:auto;height:auto;min-height:clamp(74px,calc(var(--u)*20),110px);flex:none}
-.portrait .cap{font-size:clamp(17px,calc(var(--u)*4.5),26px)}
+.portrait .cap{font-size:clamp(19px,calc(var(--u)*5.1),29px)}
 
 /* ---------- שכבות HTML על האיור ---------- */
 .badge{position:absolute;top:4%;right:3%;display:flex;align-items:center;gap:.4em;background:#FBFAF7;border:1px solid rgba(30,39,34,.14);border-radius:999px;padding:.35em .9em;font-weight:700;font-size:max(12px,calc(var(--u)*1.35));line-height:1.2;box-shadow:0 2px 8px rgba(30,39,34,.06)}
@@ -85,6 +85,12 @@ button,input{font-family:inherit}
 .send svg{width:52%;height:52%}
 .handoff{flex:none;display:flex;flex-direction:column;align-items:center;gap:.4em;padding:0 .8em .4em}
 .hline{width:2px;height:.9em;background:var(--teal);opacity:0}
+.live{margin-inline-start:auto;display:inline-flex;align-items:center;gap:.4em;font-size:.78em;color:var(--muteText)}
+.live i{width:.55em;height:.55em;border-radius:50%;background:#3E9B5B}
+.call{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:.5em;padding:.7em .7em 0}
+.tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:.6em;padding:1.6em .2em 1.2em;background:#26302A;border-radius:.8em;color:#fff;font-weight:700;font-size:.9em;line-height:1.2;text-align:center;opacity:0;visibility:hidden}
+.tile .av{width:4.6em;height:4.6em}
+.tile .ring{position:absolute;top:1.6em;left:50%;width:4.6em;height:4.6em;margin-left:-2.3em;border-radius:50%;box-shadow:0 0 0 .22em #5FC3D3;opacity:0}
 .card{width:80%;background:#fff;border:1px solid rgba(30,39,34,.13);border-radius:.7em;padding:.45em .75em;display:flex;align-items:center;gap:.5em;font-size:.92em;line-height:1.3;opacity:0;visibility:hidden;box-shadow:0 3px 10px rgba(30,39,34,.07)}
 .card .d{width:.65em;height:.65em;border-radius:50%;flex:none}
 .card b{font-weight:700}
@@ -283,8 +289,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-o
       <p class="cap" data-a="10.2" data-b="15.5">הוא מגלה רק כשהעלים מצהיבים. ואז מתחיל לחפש.</p>
       <p class="cap" data-a="15.7" data-b="19">אותו שבוע. הפעם, המידע מגיע קודם.</p>
       <p class="cap" data-a="20.8" data-b="30">בלי להזין נתונים.</p>
-      <p class="cap" data-a="42.4" data-b="46.1">המדריך כבר יודע מה קרה השבוע במים ובדישון.</p>
-      <p class="cap" data-a="46.4" data-b="52">אותו שבוע. אותם מים. ההבדל: מתי אלי יודע.</p>
+      <p class="cap" data-a="39.4" data-b="44.4">אותו שבוע. אותם מים. ההבדל: מתי אלי יודע.</p>
+      <p class="cap" data-a="56.6" data-b="60.4">שיחת ועידה: מסכמים שאין פה באמת בעיה.</p>
     </div>
 
     <!-- ===== צ'אט ושבוע ===== -->
@@ -301,6 +307,14 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-o
             <div class="msg out" data-at="32.8"><div class="bub">בכמה להקטין את הדישון? תפרט לי לפי החלקות.</div></div>
             <div class="msg in" data-at="33.0" data-until="33.7"><div class="bub dots"><i></i><i></i><i></i></div></div>
             <div class="msg in" data-at="33.7"><div class="bub">לפי החלקות שלך וההנחיה של המדריך: בכרוב, להפחית את הדישון ב-20%. בבננות, להפחית ב-15% ולהגדיל את תדירות ההשקיה.</div></div>
+            <!-- סצנה 8: כמה ימים אחרי -->
+            <div class="msg out" data-at="46.3"><div class="bub photo">
+              <svg viewBox="0 0 120 84" aria-hidden="true"><rect width="120" height="84" fill="#DCD2B8"/><rect width="120" height="34" fill="#E8ECE0"/><path d="M60 82 C 59 66, 61 54, 60 40" stroke="#5E8C4E" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M60 66 C 42 50, 18 52, 8 62 C 26 74, 46 72, 60 68Z" fill="#C9A845"/><path d="M60 60 C 78 44, 102 44, 112 54 C 96 68, 74 66, 60 62Z" fill="#C2A23F"/><path d="M60 46 C 52 30, 54 18, 60 12 C 67 22, 66 36, 60 46Z" fill="#8DBE6E"/></svg>
+              <span>תסתכל על זה.</span>
+            </div></div>
+            <div class="msg in" data-at="46.8"><div class="bub">מעבד את המידע</div></div>
+            <div class="msg in" data-at="48.3"><div class="bub">הבעיה נראית רק בעלים הבוגרים ולא בצעירים.</div></div>
+            <div class="msg in" data-at="51.2"><div class="bub">לא מדובר בבעיה רצינית אך בוא נוודא עם המדריך שלך</div></div>
           </div>
           <div class="cinput">
             <div class="field"><span id="typeTxt"></span><span class="caret" id="caret"></span></div>
@@ -309,19 +323,20 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-o
         </div>
 
         <div class="screen" id="scrB" style="opacity:0;visibility:hidden">
-          <div class="chead group">
-            <div class="pt"><span class="av av-eli"><svg viewBox="0 0 24 24"><path d="M5 11h14l-2-1.2c-.4-3-2.3-4.8-5-4.8s-4.6 1.8-5 4.8z" fill="#fff"/><circle cx="12" cy="14.5" r="3" fill="#fff"/><path d="M6 22c.6-3 3-4.6 6-4.6s5.4 1.6 6 4.6z" fill="#fff"/></svg></span><span>אלי</span></div>
-            <div class="pt"><span class="av av-adv"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" fill="#fff"/><path d="M4.5 21c.8-4 3.8-6.2 7.5-6.2s6.7 2.2 7.5 6.2z" fill="#fff"/></svg></span><span>המדריך</span></div>
-            <div class="pt"><span class="av av-as"><svg viewBox="0 0 24 24"><path d="M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11z" fill="#fff"/></svg></span><span>העוזר האישי שלך</span></div>
+          <div class="chead">
+            <span class="av av-as"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+            <span>שיחת ועידה</span>
+            <span class="live" id="live"><i></i>3 משתתפים</span>
           </div>
-          <div class="handoff">
-            <div class="hline" id="hline"></div>
-            <div class="card" id="card1"><span class="d" style="background:#C9902A"></span><span><b>המים:</b> המליחות עלתה</span></div>
-            <div class="card" id="card2"><span class="d" style="background:#1F7A8C"></span><span><b>הדישון:</b> הופחת</span></div>
+          <!-- סצנה 9: שלוש הדמויות בשיחה -->
+          <div class="call">
+            <div class="tile" id="tl1"><span class="ring"></span><span class="av av-eli"><svg viewBox="0 0 24 24"><path d="M5 11h14l-2-1.2c-.4-3-2.3-4.8-5-4.8s-4.6 1.8-5 4.8z" fill="#fff"/><circle cx="12" cy="14.5" r="3" fill="#fff"/><path d="M6 22c.6-3 3-4.6 6-4.6s5.4 1.6 6 4.6z" fill="#fff"/></svg></span><span>אלי</span></div>
+            <div class="tile" id="tl2"><span class="ring"></span><span class="av av-adv"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" fill="#fff"/><path d="M4.5 21c.8-4 3.8-6.2 7.5-6.2s6.7 2.2 7.5 6.2z" fill="#fff"/></svg></span><span>המדריך</span></div>
+            <div class="tile" id="tl3"><span class="ring"></span><span class="av av-as"><svg viewBox="0 0 24 24"><path d="M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11z" fill="#fff"/></svg></span><span>העוזר האישי</span></div>
           </div>
           <div class="msgs">
-            <div class="msg out" data-at="41.4"><div class="bub photo">
-              <svg viewBox="0 0 120 84" aria-hidden="true"><rect width="120" height="84" fill="#DCD2B8"/><rect width="120" height="34" fill="#E8ECE0"/><path d="M60 82 C 59 66, 61 54, 60 40" stroke="#5E8C4E" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M60 66 C 42 50, 18 52, 8 62 C 26 74, 46 72, 60 68Z" fill="#7EA35C"/><path d="M60 60 C 78 44, 102 44, 112 54 C 96 68, 74 66, 60 62Z" fill="#6E9A55"/><path d="M60 46 C 52 30, 54 18, 60 12 C 67 22, 66 36, 60 46Z" fill="#8DBE6E"/></svg>
+            <div class="msg out" data-at="57.4"><div class="bub photo">
+              <svg viewBox="0 0 120 84" aria-hidden="true"><rect width="120" height="84" fill="#DCD2B8"/><rect width="120" height="34" fill="#E8ECE0"/><path d="M60 82 C 59 66, 61 54, 60 40" stroke="#5E8C4E" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M60 66 C 42 50, 18 52, 8 62 C 26 74, 46 72, 60 68Z" fill="#C9A845"/><path d="M60 60 C 78 44, 102 44, 112 54 C 96 68, 74 66, 60 62Z" fill="#C2A23F"/><path d="M60 46 C 52 30, 54 18, 60 12 C 67 22, 66 36, 60 46Z" fill="#8DBE6E"/></svg>
               <span>תסתכל על זה.</span>
             </div></div>
           </div>
@@ -389,8 +404,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-o
     <button class="cbtn" id="btnRestart" type="button" aria-label="התחלה מחדש">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>
     </button>
-    <input type="range" id="seek" min="0" max="56000" step="10" value="0" aria-label="מיקום בסרטון">
-    <span id="time" aria-hidden="true">0:00 / 0:56</span>
+    <input type="range" id="seek" min="0" max="64500" step="10" value="0" aria-label="מיקום בסרטון">
+    <span id="time" aria-hidden="true">0:00 / 1:15</span>
   </div>
 </div>
 
@@ -404,17 +419,18 @@ const CONFIG = {
 };
 
 /* ===== ציר הזמן המרכזי (שניות) ===== */
-const DUR = 56;
+const DUR = 64.5;   // בשניות של ציר הזמן. בזמן אמת: DUR/SPEED
 const SCENES = [
-  {n:1, start:0,    end:4.5},   // הקשר
-  {n:2, start:4.5,  end:10},    // הבעיה: המליחות עולה
-  {n:3, start:10,   end:15.5},  // הבעיה: מגלים מאוחר
-  {n:4, start:15.5, end:19},    // המפנה (Rewind)
-  {n:5, start:19,   end:30},    // השירות פונה ראשון
-  {n:6, start:30,   end:39},    // אלי שואל
-  {n:7, start:39,   end:46},    // המדריך בתמונה
-  {n:8, start:46,   end:52},    // השינוי
-  {n:9, start:52,   end:56}     // סיום
+  {n:1,  start:0,    end:4.5},   // הקשר
+  {n:2,  start:4.5,  end:10},    // הבעיה: המליחות עולה
+  {n:3,  start:10,   end:15.5},  // הבעיה: מגלים מאוחר
+  {n:4,  start:15.5, end:19},    // המפנה (Rewind)
+  {n:5,  start:19,   end:30},    // השירות פונה ראשון
+  {n:6,  start:30,   end:39},    // אלי שואל
+  {n:7,  start:39,   end:44.5},  // השינוי (שני פסי שבוע)
+  {n:8,  start:44.5, end:55},    // כמה ימים אחרי: תמונה מהשטח
+  {n:9,  start:55,   end:60.5},  // שיחת ועידה עם המדריך
+  {n:10, start:60.5, end:64.5}   // סיום
 ];
 const S = n => SCENES[n-1].start;
 
@@ -495,7 +511,7 @@ const E = {
   chat:$('chat'), scrA:$('scrA'), scrB:$('scrB'),
   msgs:Array.from(document.querySelectorAll('.msg')).map(el=>({el,at:+el.dataset.at,until:el.dataset.until?+el.dataset.until:Infinity,on:false})),
   typeTxt:$('typeTxt'), caret:$('caret'),
-  hline:$('hline'), cards:[$('card1'),$('card2')],
+  tiles:[$('tl1'),$('tl2'),$('tl3')], rings:[$('tl1'),$('tl2'),$('tl3')].map(x=>x.querySelector('.ring')),
   week:$('week'), wr1:$('wr1'), wr2:$('wr2'), mk1:$('mk1'), mk2:$('mk2'), hl1:$('hl1'), hl2:$('hl2'),
   end:$('end'), endKids:Array.from($('end').children), btnReplay:$('btnReplay'), ministryLine:$('ministryLine'),
   start:$('start'), btnStart:$('btnStart'),
@@ -514,10 +530,10 @@ else { E.ministryLine.remove(); E.endKids = Array.from(E.end.children); }
 const DAYS = ['ראשון','שני','שלישי','רביעי','חמישי'];
 // [זמן, אינדקס יום]
 const DAYSEQ = [[0,0],[5.5,1],[7.0,2],[8.5,3],[10.0,4],
-                [15.9,3],[16.25,2],[16.6,1],[16.95,0],
-                [39.0,1],[39.15,2],[39.3,3],[39.45,4]];
+                [15.9,3],[16.25,2],[16.6,1],[16.95,0]];
+const LATER_AT = 44.5, LATER_TXT = 'כמה ימים אחרי';
 const TYPE_TEXT = 'בכמה להקטין את הדישון? תפרט לי לפי החלקות.';
-const PHONE_PINGS = [20.6, 24.6, 33.7, 41.5];
+const PHONE_PINGS = [20.6, 24.6, 33.7, 46.3, 46.8, 48.3, 51.2, 55.3];
 
 /* זרימת המים ("זמן זרימה"): מתקדם, חוזר לאחור במפנה, ושוב מתקדם */
 function flowF(t){
@@ -565,8 +581,8 @@ function render(t){
   const lookK = Math.max(
     rp(t,12.0,12.5)*(1-rp(t,15.7,16.2)),
     rp(t,19.5,20.0)*(1-rp(t,39.3,39.8)),
-    rp(t,41.3,41.8)*(1-rp(t,45.8,46.2)));
-  const aimK = rp(t,39.4,40.1)*(1-rp(t,41.3,41.8));
+    rp(t,46.3,46.8)*(1-rp(t,60.0,60.4)));
+  const aimK = rp(t,44.6,45.3)*(1-rp(t,46.3,46.8));
   const th1 = lerp(lerp(8-sw*.6,-25,lookK),-70,aimK);
   const th2 = lerp(lerp(0,-135,lookK),0,aimK);
   const ap = armPts(th1,th2);
@@ -588,7 +604,7 @@ function render(t){
   let G = 0;
   if(t>=S(2) && t<S(4)) G = rp(t,4.6,5.2);
   else if(t>=S(4) && t<17.3) G = 1-rp(t,16.8,17.3);
-  else if(t>=S(5)) G = rp(t,19.0,19.6)*(1-rp(t,45.6,46.2));
+  else if(t>=S(5)) G = rp(t,19.0,19.6)*(1-rp(t,38.6,39.2));
   for(let i=0;i<grains.length;i++){
     const g=grains[i];
     const x = RM ? 460+i*33 : 452+(((F*85+i*33)%526)+526)%526;
@@ -602,21 +618,23 @@ function render(t){
   /* --- סצנות 2–4: היום בפינה --- */
   let di=0, dAt=0;
   for(const s of DAYSEQ){ if(t>=s[0]){ di=s[1]; dAt=s[0]; } }
-  if(di!==lastDay){ lastDay=di; E.dayTxt.textContent='יום '+DAYS[di]; }
+  if(t>=LATER_AT){ di=-2; dAt=LATER_AT; }
+  if(di!==lastDay){ lastDay=di; E.dayTxt.textContent = di===-2 ? LATER_TXT : 'יום '+DAYS[di]; }
   const dp = rp(t,dAt,dAt+.25);
   setO(E.dayTxt, dAt===0 ? 1 : .25+.75*dp);
   setT(E.dayTxt, 'translateY('+f1((1-dp)*-6)+'px)');
-  setO(E.badge, 1-rp(t,45.7,46.1));
+  setO(E.badge, Math.max(1-rp(t,38.8,39.2), rp(t,44.4,44.8)*(1-rp(t,60.3,60.7))));
   const rwv = win(t,S(4),17.3,.15,.3);
   E.rwIcon.classList.toggle('on', rwv>0);
   setO(E.rwIcon, rwv);
 
   /* --- סצנה 3: התקריב והחיפוש --- */
-  const I = rp(t,10.0,10.6)*(1-rp(t,16.7,17.3));
+  // התקריב מופיע שוב בסצנה 8: העלים הבוגרים צהובים, הצעירים ירוקים
+  const I = Math.max(rp(t,10.0,10.6)*(1-rp(t,16.7,17.3)), rp(t,44.7,45.3)*(1-rp(t,54.6,55.2)));
   const isc = .6+.4*eo(I);
   setA(E.inset,'transform','translate(720 190) scale('+isc.toFixed(3)+') translate(-720 -190)');
   setO(E.inset,I);
-  const L = rp(t,10.8,12.8)*(1-rp(t,15.6,16.9));
+  const L = Math.max(rp(t,10.8,12.8)*(1-rp(t,15.6,16.9)), (t>=44.5 && t<55.3) ? .85 : 0);
   const lq = Math.round(L*100)/100;
   if(lq!==lastLeaf){ lastLeaf=lq; const c=mix('#6E9A55','#D9AE45',lq); E.old1.setAttribute('fill',c); E.old2.setAttribute('fill',c); }
   const tint = Math.round(L*45)/100;
@@ -677,20 +695,20 @@ function render(t){
   fillTag(E.tagC,TC,t,34.4);
   fillTag(E.tagB,TB,t,34.9);
 
-  /* --- סצנה 7: צילום --- */
-  const fl = (!RM && t>=40.3 && t<40.9) ? Math.sin(Math.PI*(t-40.3)/.6)*.22 : 0;
+  /* --- סצנה 8: צילום --- */
+  const fl = (!RM && t>=45.2 && t<45.8) ? Math.sin(Math.PI*(t-45.2)/.6)*.22 : 0;
   setO(E.flash,fl);
-  const pk = eio(rp(t,40.6,41.4));
-  const pv = win(t,40.5,41.5,.1,.15);
+  const pk = eio(rp(t,45.5,46.3));
+  const pv = win(t,45.4,46.4,.1,.15);
   setA(E.photo,'transform','translate('+f1(lerp(520,phX,pk))+' '+f1(lerp(368,phY,pk))+') scale('+lerp(1.3,.35,pk).toFixed(3)+')');
   setO(E.photo,pv);
 
-  /* --- צ'אט (סצנות 5–7) --- */
-  const K = win(t,19.1,46.2,.6,.5);
+  /* --- צ'אט (סצנות 5–6, 8–9) --- */
+  const K = Math.max(win(t,19.1,39.3,.6,.4), win(t,44.4,60.7,.5,.5));
   setO(E.chat,K);
   const ke = eo(K);
   setT(E.chat, isPortrait ? 'translateY('+f1((1-ke)*16)+'px)' : 'translateX('+f1(-(1-ke)*24)+'px)');
-  const bk = rp(t,39.0,39.4);
+  const bk = rp(t,54.9,55.3);
   setO(E.scrA,1-bk); setO(E.scrB,bk);
   for(const m of E.msgs){
     const on = t>=m.at && t<m.until;
@@ -708,26 +726,31 @@ function render(t){
   if(typed!==lastType){ lastType=typed; E.typeTxt.textContent=typed; }
   setO(E.caret, (t>=30.25 && t<32.8) ? 1 : 0);
 
-  setO(E.hline, rp(t,42.2,42.5));
-  E.cards.forEach((c,j)=>{
-    const a=42.2+.6*j;
-    const p=eio(rp(t,a,a+.8));
+  /* --- סצנה 9: שיחת הוועידה. הדמויות מצטרפות, וטבעת מסמנת מי מדבר --- */
+  E.tiles.forEach((c,j)=>{
+    const a=55.4+.35*j;
+    const p=eob(rp(t,a,a+.6));
     setO(c, rp(t,a,a+.3));
-    setT(c,'translateX('+f1(-(1-p)*45)+'%)');
+    setT(c,'scale('+(.85+.15*p).toFixed(3)+')');
+  });
+  const SPEAK = [[59.0,60.4],[57.6,59.0],[56.3,57.6]];   // אלי · המדריך · העוזר
+  E.rings.forEach((g,j)=>{
+    const w = win(t,SPEAK[j][0],SPEAK[j][1],.2,.2);
+    setO(g, w*(RM ? 1 : .55+.45*Math.sin(t*9)));
   });
 
-  /* --- סצנה 8: השבוע --- */
-  setO(E.week, win(t,45.9,52.3,.6,.45));
-  setO(E.wr1, rp(t,46.2,46.6));
-  setO(E.wr2, rp(t,46.5,46.9));
-  markLand(E.mk1,E.hl1,t,46.9);
-  markLand(E.mk2,E.hl2,t,47.6);
+  /* --- סצנה 7: השבוע --- */
+  setO(E.week, win(t,38.9,44.6,.6,.45));
+  setO(E.wr1, rp(t,39.2,39.6));
+  setO(E.wr2, rp(t,39.5,39.9));
+  markLand(E.mk1,E.hl1,t,39.9);
+  markLand(E.mk2,E.hl2,t,40.6);
 
-  /* --- סצנה 9: סיום --- */
-  const EE = rp(t,52.0,52.8);
+  /* --- סצנה 10: סיום --- */
+  const EE = rp(t,60.5,61.3);
   setO(E.end,EE);
   E.endKids.forEach((c,j)=>{
-    const p = rp(t,52.3+.35*j,52.9+.35*j);
+    const p = rp(t,60.8+.35*j,61.4+.35*j);
     setO(c,p);
     setT(c,'translateY('+f1((1-eo(p))*8)+'px)');
   });
@@ -755,16 +778,18 @@ function markLand(mk,hl,t,a){
 }
 
 /* ===== נגן ===== */
+// מהירות הניגון: 1 = המקור. מתחת ל-1 הכול איטי יותר (התנועה, הכתוביות וההודעות), והתזמונים בקוד לא משתנים.
+const SPEED = 0.85;
 let t=0, playing=false, started=false, last=0, scrubbing=false, lastSec=-1;
 const fmt = s => Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 
 function updateUI(){
   if(!scrubbing) E.seek.value = Math.round(t*1000);
-  const sec = Math.floor(t);
+  const sec = Math.floor(t/SPEED);   // הזמן שמוצג לצופה: זמן אמיתי
   if(sec!==lastSec){
     lastSec=sec;
-    E.time.textContent = fmt(t)+' / '+fmt(DUR);
-    E.seek.setAttribute('aria-valuetext', fmt(t)+' מתוך '+fmt(DUR));
+    E.time.textContent = fmt(t/SPEED)+' / '+fmt(DUR/SPEED);
+    E.seek.setAttribute('aria-valuetext', fmt(t/SPEED)+' מתוך '+fmt(DUR/SPEED));
   }
   E.icoPlay.style.display = playing?'none':'block';
   E.icoPause.style.display = playing?'block':'none';
@@ -774,7 +799,7 @@ function loop(ts){
   if(!playing) return;
   let dt=(ts-last)/1000; last=ts;
   if(dt>.25) dt=.25; if(dt<0) dt=0;
-  t=Math.min(DUR,t+dt);
+  t=Math.min(DUR,t+dt*SPEED);
   if(t>=DUR){ t=DUR; playing=false; }
   render(t); updateUI();
   if(playing) requestAnimationFrame(loop);
