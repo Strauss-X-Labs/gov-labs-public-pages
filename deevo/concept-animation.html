@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Deevo · הדגמת קונספט</title>
+<style>
+  :root {
+    --bg: #F7F5F0; --ink: #1B2A4A; --muted: #6B7280; --amber: #E0A544; --teal: #2F7D78;
+    --card: #FFFFFF; --line: #DCD7CC; --page: #ECE8DF;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--ink); color-scheme: light; }
+  body {
+    font-family: "Assistant", "Rubik", "Heebo", "Arial Hebrew", Arial, sans-serif;
+    min-height: 100vh; padding: 16px; display: flex; flex-direction: column; justify-content: center;
+  }
+  .player { width: 100%; max-width: min(1280px, calc((100vh - 110px) * 16 / 9)); min-width: 0; margin: 0 auto; }
+  @media (max-width: 700px) { .player { max-width: 100%; } }
+  .stage {
+    position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--bg);
+    border-radius: 14px; overflow: hidden; container-type: inline-size;
+    box-shadow: 0 10px 30px rgba(27, 42, 74, 0.12);
+  }
+  .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .tag {
+    position: absolute; top: 2.2cqw; left: 2.2cqw; font-size: clamp(10px, 1.5cqw, 16px);
+    color: var(--muted); background: rgba(255,255,255,0.75); padding: 0.15em 0.7em; border-radius: 999px;
+  }
+  .cap {
+    position: absolute; top: max(5.2cqw, 30px); right: 6cqw; left: 6cqw; text-align: center;
+    font-size: clamp(15px, 3.5cqw, 44px); font-weight: 700; line-height: 1.3; color: var(--ink);
+    opacity: 0; will-change: opacity, transform;
+  }
+  .overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.6cqw; background: rgba(247, 245, 240, 0.94); text-align: center; padding: 4cqw;
+  }
+  .overlay[hidden] { display: none; }
+  .overlay h1 { margin: 0; font-size: clamp(22px, 5.5cqw, 64px); font-weight: 800; letter-spacing: -0.01em; }
+  .overlay p { margin: 0; font-size: clamp(13px, 2cqw, 22px); color: var(--muted); }
+  .big-btn {
+    font: inherit; font-weight: 700; font-size: clamp(14px, 2.2cqw, 24px); color: #fff; background: var(--ink);
+    border: 0; border-radius: 999px; padding: 0.55em 1.6em; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5em;
+  }
+  .big-btn:focus-visible, .ctl:focus-visible, input[type=range]:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+  .controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; direction: ltr; }
+  .ctl {
+    flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: #fff;
+    color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .ctl svg { width: 18px; height: 18px; }
+  input[type=range] { flex: 1; min-width: 0; accent-color: var(--ink); height: 28px; }
+  .time { flex: none; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; min-width: 84px; text-align: center; }
+  svg text { font-family: "Assistant", "Rubik", "Heebo", "Arial Hebrew", Arial, sans-serif; }
+</style>
+</head>
+<body>
+<div class="player">
+  <div class="stage" id="stage">
+    <svg viewBox="0 0 1600 900" aria-hidden="true">
+      <defs>
+        <!-- אישה: שיער באורך כתפיים -->
+        <symbol id="woman" viewBox="-70 -190 140 250" overflow="visible">
+          <path d="M-62 60 C-62 -10 -40 -48 0 -48 C40 -48 62 -10 62 60 Z" fill="currentColor"/>
+          <path d="M-14 -58 L14 -58 L12 -40 L-12 -40 Z" fill="#D9A77E"/>
+          <path d="M-40 -112 C-44 -160 -12 -178 4 -176 C36 -174 48 -146 42 -108 C40 -86 46 -72 40 -62 L-38 -62 C-46 -74 -38 -90 -40 -112 Z" fill="#3B2A22"/>
+          <circle cx="0" cy="-104" r="30" fill="#E3B38C"/>
+          <path d="M-31 -112 C-28 -146 26 -150 32 -114 C14 -126 -10 -128 -31 -112 Z" fill="#3B2A22"/>
+        </symbol>
+        <!-- שותף, שיער קצר -->
+        <symbol id="partnerA" viewBox="-70 -190 140 250" overflow="visible">
+          <path d="M-60 60 C-60 -8 -38 -46 0 -46 C38 -46 60 -8 60 60 Z" fill="currentColor"/>
+          <circle cx="0" cy="-102" r="30" fill="#C99470"/>
+          <path d="M-31 -108 C-30 -140 30 -142 31 -108 C18 -122 -16 -122 -31 -108 Z" fill="#2A2522"/>
+        </symbol>
+        <symbol id="partnerB" viewBox="-70 -190 140 250" overflow="visible">
+          <path d="M-60 60 C-60 -8 -38 -46 0 -46 C38 -46 60 -8 60 60 Z" fill="currentColor"/>
+          <path d="M-36 -100 C-40 -146 36 -150 36 -100 L36 -70 L-36 -70 Z" fill="#6B4A36"/>
+          <circle cx="0" cy="-100" r="29" fill="#E8C3A0"/>
+          <path d="M-30 -108 C-24 -140 26 -140 30 -110 C10 -124 -12 -122 -30 -108 Z" fill="#6B4A36"/>
+        </symbol>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="160%">
+          <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#1B2A4A" flood-opacity="0.10"/>
+        </filter>
+      </defs>
+
+      <!-- רקע: קו אופק עדין -->
+      <rect x="0" y="0" width="1600" height="900" fill="#F7F5F0"/>
+      <rect x="0" y="760" width="1600" height="140" fill="#EFEBE2"/>
+
+      <!-- ===== השולחן והמפתחת (סצנות 1–2, 4–7) ===== -->
+      <g id="desk">
+        <g id="devSeat" transform="translate(1280 600) scale(1.55)" style="color:#2F7D78"><use href="#woman" x="-70" y="-190" width="140" height="250"/></g>
+        <rect x="1060" y="640" width="440" height="22" rx="6" fill="#B9A58A"/>
+        <rect x="1090" y="662" width="16" height="140" fill="#A8947A"/>
+        <rect x="1455" y="662" width="16" height="140" fill="#A8947A"/>
+        <g id="laptop"><rect x="1150" y="560" width="190" height="82" rx="8" fill="#1B2A4A"/><rect x="1130" y="636" width="230" height="10" rx="4" fill="#3A4A6B"/></g>
+        <g id="mug"><rect x="1400" y="600" width="34" height="40" rx="6" fill="#E0A544"/><path d="M1434 610 C1450 610 1450 630 1434 630" stroke="#E0A544" stroke-width="6" fill="none"/></g>
+      </g>
+
+      <g id="nameTag" transform="translate(1280 715)">
+        <rect x="-70" y="-26" width="140" height="52" rx="26" fill="#1B2A4A"/>
+        <text x="0" y="10" text-anchor="middle" direction="rtl" font-size="30" font-weight="700" fill="#fff">ליאת</text>
+      </g>
+
+      <!-- כרטיס "צורך חדש" (סצנה 1, ובסצנה 4 נכנס למשטח) -->
+      <g id="need" filter="url(#soft)">
+        <rect x="-95" y="-38" width="190" height="76" rx="12" fill="#fff" stroke="#E0A544" stroke-width="4"/>
+        <text x="0" y="12" text-anchor="middle" direction="rtl" font-size="34" font-weight="700" fill="#1B2A4A">צורך חדש</text>
+      </g>
+
+      <!-- כרטיסי ידע (סצנות 2, 4) -->
+      <g id="kcards"></g>
+
+      <!-- ===== השביל (סצנה 3) ===== -->
+      <g id="pathScene">
+        <path id="longPath" d="M1460 760 C1240 760 1300 600 1080 610 C860 620 900 760 690 740 C480 720 560 520 380 520 C240 520 230 470 300 430" fill="none" stroke="#C9C1B2" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 22"/>
+        <g id="walker"><g transform="scale(0.55)" style="color:#2F7D78"><use href="#woman" x="-70" y="-190" width="140" height="250"/></g></g>
+        <g id="crackCard" transform="translate(300 280)">
+          <rect id="crackRect" x="-110" y="-46" width="220" height="92" rx="12" fill="#fff" stroke="#1B2A4A" stroke-width="3" filter="url(#soft)"/>
+          <text x="0" y="12" text-anchor="middle" direction="rtl" font-size="38" font-weight="700" fill="#1B2A4A">הנחה</text>
+          <path id="crack" transform="translate(62 0)" d="M-20 -46 L-4 -14 L-22 6 L2 26 L-8 46" fill="none" stroke="#B4561E" stroke-width="5" stroke-linejoin="round"/>
+        </g>
+      </g>
+
+      <!-- ===== המשטח של Deevo (סצנות 4–7) ===== -->
+      <g id="srcs">
+        <path id="srcP1" d="M180 250 C300 250 330 330 420 360" fill="none" stroke="#2F7D78" stroke-width="4" stroke-linecap="round"/>
+        <path id="srcP2" d="M150 480 C260 480 300 470 420 470" fill="none" stroke="#2F7D78" stroke-width="4" stroke-linecap="round"/>
+        <path id="srcP3" d="M180 700 C300 700 330 610 420 580" fill="none" stroke="#2F7D78" stroke-width="4" stroke-linecap="round"/>
+        <g id="src1" transform="translate(150 250)"><rect x="-130" y="-30" width="260" height="60" rx="30" fill="#E3F0EE"/><text x="0" y="11" text-anchor="middle" direction="rtl" font-size="30" font-weight="700" fill="#2F7D78">מענים קודמים</text></g>
+        <g id="src2" transform="translate(150 480)"><rect x="-130" y="-30" width="260" height="60" rx="30" fill="#E3F0EE"/><text x="0" y="11" text-anchor="middle" direction="rtl" font-size="30" font-weight="700" fill="#2F7D78">מחקרים ונתונים</text></g>
+        <g id="src3" transform="translate(150 700)"><rect x="-130" y="-30" width="260" height="60" rx="30" fill="#E3F0EE"/><text x="0" y="11" text-anchor="middle" direction="rtl" font-size="30" font-weight="700" fill="#2F7D78">ניסיון מהשטח</text></g>
+      </g>
+
+      <g id="panel">
+        <rect x="420" y="250" width="620" height="460" rx="22" fill="#fff" stroke="#DCD7CC" stroke-width="3" filter="url(#soft)"/>
+        <rect x="420" y="250" width="620" height="58" rx="22" fill="#1B2A4A"/>
+        <rect x="420" y="285" width="620" height="23" fill="#1B2A4A"/>
+        <text x="1005" y="290" text-anchor="end" direction="ltr" font-size="28" font-weight="800" fill="#fff">Deevo</text>
+        <circle cx="455" cy="279" r="7" fill="#E0A544"/><circle cx="478" cy="279" r="7" fill="#4C5D80"/><circle cx="501" cy="279" r="7" fill="#4C5D80"/>
+
+        <!-- בלוקים: בעיה ← פעולות ← תוצאות (מימין לשמאל) -->
+        <g id="blocks">
+          <path id="arr1" d="M818 470 L770 470" stroke="#1B2A4A" stroke-width="4"/>
+          <path id="arr2" d="M613 470 L562 470" stroke="#1B2A4A" stroke-width="4"/>
+          <path d="M782 461 L768 470 L782 479" fill="none" stroke="#1B2A4A" stroke-width="4" id="ah1"/>
+          <path d="M574 461 L560 470 L574 479" fill="none" stroke="#1B2A4A" stroke-width="4" id="ah2"/>
+          <g id="b1" transform="translate(905 470)"><rect id="b1r" x="-85" y="-48" width="170" height="96" rx="14" fill="#F2EFE8" stroke="#1B2A4A" stroke-width="3"/><text x="0" y="11" text-anchor="middle" direction="rtl" font-size="32" font-weight="700" fill="#1B2A4A">בעיה</text></g>
+          <g id="b2" transform="translate(690 470)"><rect id="b2r" x="-75" y="-48" width="150" height="96" rx="14" fill="#F2EFE8" stroke="#1B2A4A" stroke-width="3"/><text x="0" y="11" text-anchor="middle" direction="rtl" font-size="32" font-weight="700" fill="#1B2A4A">פעולות</text></g>
+          <g id="b3" transform="translate(495 470)"><rect id="b3r" x="-62" y="-48" width="124" height="96" rx="14" fill="#F2EFE8" stroke="#1B2A4A" stroke-width="3"/><text x="0" y="11" text-anchor="middle" direction="rtl" font-size="30" font-weight="700" fill="#1B2A4A">תוצאות</text></g>
+          <g id="missing" transform="translate(495 610)"><rect x="-62" y="-36" width="124" height="72" rx="14" fill="none" stroke="#8A93A3" stroke-width="3" stroke-dasharray="8 8"/><text x="0" y="10" text-anchor="middle" direction="rtl" font-size="28" fill="#6B7280">חסר</text></g>
+          <g id="marker" transform="translate(690 380)"><path d="M0 26 L-14 4 A18 18 0 1 1 14 4 Z" fill="#1B2A4A"/><circle cx="0" cy="-8" r="7" fill="#fff"/><text x="0" y="-36" text-anchor="middle" direction="rtl" font-size="26" font-weight="700" fill="#1B2A4A">את כאן</text></g>
+          <g id="flag" transform="translate(745 420)"><path d="M0 0 L0 -64" stroke="#1B2A4A" stroke-width="4"/><path d="M0 -64 L40 -52 L0 -40 Z" fill="#E0A544"/></g>
+          <g id="check" transform="translate(745 420)"><circle r="20" fill="#2F7D78"/><path d="M-9 0 L-2 8 L10 -7" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+        </g>
+      </g>
+
+      <!-- בועת שאלה (סצנה 6) -->
+      <g id="bubble" filter="url(#soft)">
+        <path d="M560 560 L1020 560 Q1040 560 1040 580 L1040 660 Q1040 680 1020 680 L640 680 L600 712 L606 680 L560 680 Q540 680 540 660 L540 580 Q540 560 560 560 Z" fill="#FFF7E8" stroke="#E0A544" stroke-width="3"/>
+        <text x="790" y="633" text-anchor="middle" direction="rtl" font-size="40" font-weight="700" fill="#1B2A4A">על מה ההנחה הזו נשענת?</text>
+      </g>
+
+      <!-- הצעות לצעד הבא (סצנה 7) -->
+      <g id="chips">
+        <g id="chip1" transform="translate(880 790)"><rect id="chip1r" x="-170" y="-34" width="340" height="68" rx="34" fill="#fff" stroke="#1B2A4A" stroke-width="3"/><text id="chip1t" x="0" y="11" text-anchor="middle" direction="rtl" font-size="30" font-weight="700" fill="#1B2A4A">לבדוק עם אנשי השטח</text></g>
+        <g id="chip2" transform="translate(520 790)"><rect x="-175" y="-34" width="350" height="68" rx="34" fill="#fff" stroke="#1B2A4A" stroke-width="3"/><text x="0" y="11" text-anchor="middle" direction="rtl" font-size="30" font-weight="700" fill="#1B2A4A">לחפש מענה דומה שנוסה</text></g>
+        <g id="cursor"><path d="M0 0 L0 38 L10 28 L18 46 L26 42 L18 25 L32 25 Z" fill="#1B2A4A" stroke="#fff" stroke-width="2"/></g>
+      </g>
+
+      <!-- ===== שותפים (סצנה 8) ===== -->
+      <g id="meet">
+        <g id="board">
+          <rect x="560" y="250" width="560" height="400" rx="18" fill="#fff" stroke="#DCD7CC" stroke-width="3" filter="url(#soft)"/>
+          <g transform="translate(990 370)"><rect x="-75" y="-42" width="150" height="84" rx="12" fill="#F2EFE8" stroke="#1B2A4A" stroke-width="3"/><text x="0" y="10" text-anchor="middle" direction="rtl" font-size="28" font-weight="700" fill="#1B2A4A">בעיה</text></g>
+          <g transform="translate(840 370)"><rect x="-60" y="-42" width="120" height="84" rx="12" fill="#E3F0EE" stroke="#2F7D78" stroke-width="3"/><text x="0" y="10" text-anchor="middle" direction="rtl" font-size="28" font-weight="700" fill="#1B2A4A">פעולות</text></g>
+          <g transform="translate(690 370)"><rect x="-62" y="-42" width="124" height="84" rx="12" fill="#F2EFE8" stroke="#1B2A4A" stroke-width="3"/><text x="0" y="10" text-anchor="middle" direction="rtl" font-size="26" font-weight="700" fill="#1B2A4A">תוצאות</text></g>
+          <path d="M912 370 L900 370 M770 370 L754 370" stroke="#1B2A4A" stroke-width="4"/>
+          <g id="badge1" transform="translate(975 500)"><rect x="-125" y="-34" width="250" height="68" rx="34" fill="#E3F0EE" stroke="#2F7D78" stroke-width="3"/>
+            <g transform="translate(92 0)"><circle r="17" fill="#2F7D78"/><path d="M-8 6 L-8 -2 M-2 6 L-2 -8 M4 6 L4 -4" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></g>
+            <text x="-18" y="10" text-anchor="middle" direction="rtl" font-size="28" font-weight="700" fill="#1B2A4A">מדד לכל מטרה</text></g>
+          <g id="badge2" transform="translate(705 500)"><rect x="-125" y="-34" width="250" height="68" rx="34" fill="#E3F0EE" stroke="#2F7D78" stroke-width="3"/>
+            <g transform="translate(92 0)"><path d="M0 -18 L15 -11 L15 2 C15 11 8 17 0 20 C-8 17 -15 11 -15 2 L-15 -11 Z" fill="#2F7D78"/><path d="M-6 1 L-1 6 L7 -4" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+            <text x="-18" y="10" text-anchor="middle" direction="rtl" font-size="28" font-weight="700" fill="#1B2A4A">תוכנית סיכונים</text></g>
+          <g id="stamp" transform="translate(840 600)"><rect x="-95" y="-28" width="190" height="56" rx="10" fill="#fff" stroke="#2F7D78" stroke-width="4"/>
+            <text x="0" y="11" text-anchor="middle" direction="rtl" font-size="32" font-weight="800" fill="#2F7D78">מוסכם ✓</text></g>
+        </g>
+        <g id="devStand" transform="translate(1260 700) scale(1.35)" style="color:#2F7D78"><use href="#woman" x="-70" y="-190" width="140" height="250"/></g>
+        <g id="pA" transform="translate(330 720) scale(1.3)" style="color:#4C5D80"><g id="pAhead"><use href="#partnerA" x="-70" y="-190" width="140" height="250"/></g></g>
+        <g id="pB" transform="translate(470 735) scale(1.22)" style="color:#B9A58A"><g id="pBhead"><use href="#partnerB" x="-70" y="-190" width="140" height="250"/></g></g>
+      </g>
+
+      <!-- ===== שביל קצר (סצנה 9) ===== -->
+      <g id="shortScene">
+        <path id="shortPath" d="M1240 720 C1060 720 1000 600 800 600 C600 600 560 720 360 720" fill="none" stroke="#2F7D78" stroke-width="10" stroke-linecap="round"/>
+        <g id="cp1" transform="translate(1030 650)"><circle r="22" fill="#2F7D78"/><path d="M-10 0 L-3 8 L10 -7" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+        <g id="cp2" transform="translate(800 600)"><circle r="22" fill="#2F7D78"/><path d="M-10 0 L-3 8 L10 -7" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+        <g id="cp3" transform="translate(570 652)"><circle r="22" fill="#2F7D78"/><path d="M-10 0 L-3 8 L10 -7" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+        <g id="walker2"><g transform="scale(0.55)" style="color:#2F7D78"><use href="#woman" x="-70" y="-190" width="140" height="250"/></g></g>
+      </g>
+
+      <!-- כרטיס הסיום -->
+      <g id="endCard">
+        <rect x="0" y="0" width="1600" height="900" fill="#F7F5F0"/>
+        <text x="800" y="450" text-anchor="middle" font-size="150" font-weight="800" fill="#1B2A4A" letter-spacing="-2">Deevo</text>
+        <rect id="endLine" x="660" y="492" width="280" height="8" rx="4" fill="#E0A544"/>
+        <text x="800" y="575" text-anchor="middle" font-size="50" font-weight="600" fill="#2F7D78">Build it right</text>
+      </g>
+    </svg>
+
+    <div class="tag">הדגמת קונספט</div>
+    <div class="cap" id="cap"></div>
+
+    <div class="overlay" id="startOverlay">
+      <h1>Deevo</h1>
+      <p>הדגמת קונספט · 59 שניות · צלילים עדינים, בלי דיבור</p>
+      <button class="big-btn" id="startBtn" type="button"><span aria-hidden="true">▶</span> צפייה</button>
+    </div>
+    <div class="overlay" id="endOverlay" hidden>
+      <h1>Deevo</h1>
+      <p>Build it right</p>
+      <button class="big-btn" id="replayBtn" type="button"><span aria-hidden="true">↺</span> צפייה חוזרת</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctl" id="playBtn" type="button" aria-label="ניגון">
+      <svg viewBox="0 0 24 24" id="icoPlay"><path d="M7 4 L20 12 L7 20 Z" fill="currentColor"/></svg>
+      <svg viewBox="0 0 24 24" id="icoPause" style="display:none"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg>
+    </button>
+    <button class="ctl" id="restartBtn" type="button" aria-label="מההתחלה">
+      <svg viewBox="0 0 24 24"><path d="M5 12 A7 7 0 1 0 8 6.3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M4 3 L8 6.5 L4 10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="ctl" id="muteBtn" type="button" aria-label="השתקה" aria-pressed="false">
+      <svg viewBox="0 0 24 24" id="icoSound"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 9 C17.5 10.5 17.5 13.5 16 15 M18.5 6.5 C21.5 9.5 21.5 14.5 18.5 17.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 24 24" id="icoMute" style="display:none"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 9 L22 15 M22 9 L16 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <input type="range" id="seek" min="0" max="59" step="0.05" value="0" aria-label="מיקום בסרטון">
+    <span class="time" id="time">0:00 / 0:59</span>
+  </div>
+</div>
+
+<script>
+/* ===== התוכן: סצנות, זמנים וטקסטים ===== */
+const DATA = {
+  duration: 59,
+  scenes: [
+    { n: 1, part: "A", start: 0,  end: 5,  text: "ליאת מפתחת תוכניות חברתיות. עלה לה רעיון חדש." },
+    { n: 2, part: "B", start: 5,  end: 10, text: "הידע קיים, אבל מפוזר ולא כתוב." },
+    { n: 3, part: "B", start: 10, end: 16, text: "ולפעמים מגלים מאוחר מדי שמשהו לא עובד." },
+    { n: 4, part: "C", start: 16, end: 22, text: "Deevo מחבר את מה שכבר ידוע, במקום אחד." },
+    { n: 5, part: "C", start: 22, end: 28, text: "רואים איפה המענה עומד, ומה חסר." },
+    { n: 6, part: "C", start: 28, end: 35, text: "הוא מאתגר הנחות ומציף נקודות עיוורון." },
+    { n: 7, part: "C", start: 35, end: 42, text: "ההחלטה שלה. הוא מדייק את הצעד הבא." },
+    { n: 8, part: "D", start: 42, end: 47, text: "מענה מבוסס, עם מדד לכל מטרה ותוכנית סיכונים." },
+    { n: 9, part: "D", start: 47, end: 52, text: "מגיעים להסכמות עם השותפים, ויוצאים לדרך עם המענה החברתי." },
+    { n: 10, part: "D", start: 52, end: 59, text: "דרך קצרה יותר, עם פחות הפתעות בדרך ליצירת אימפקט חברתי." }
+  ],
+  knowledge: ["מסמכים", "שיחות", "מענים קודמים", "מחקר", "נתונים", "ניסיון מהשטח"],
+  bubble: "על מה ההנחה הזו נשענת?",
+  nextSteps: ["לבדוק עם אנשי השטח", "לחפש מענה דומה שנוסה"]
+};
+
+/* ===== כלים ===== */
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = (x) => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const prog = (t, a, b, f = ease) => f(clamp((t - a) / (b - a)));
+const lerp = (a, b, k) => a + (b - a) * k;
+const fade = (t, a, b, d = 0.5) => Math.min(prog(t, a, a + d), 1 - prog(t, b - d, b));
+const op = (el, v) => { el.style.opacity = v.toFixed(3); el.style.visibility = v <= 0.001 ? "hidden" : "visible"; };
+const tf = (el, x, y, s = 1, r = 0) => el.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(3)})`);
+const NS = "http://www.w3.org/2000/svg";
+
+/* ===== כרטיסי הידע ===== */
+const K = DATA.knowledge.map((label, i) => {
+  const g = document.createElementNS(NS, "g");
+  g.setAttribute("filter", "url(#soft)");
+  const w = 40 + label.length * 19;
+  g.innerHTML = `<rect x="${-w / 2}" y="-34" width="${w}" height="68" rx="12" fill="#fff" stroke="#DCD7CC" stroke-width="3"/>` +
+    `<rect x="${w / 2 - 14}" y="-34" width="14" height="68" rx="6" fill="#2F7D78" opacity="0.85"/>` +
+    `<text x="-6" y="10" text-anchor="middle" direction="rtl" font-size="30" font-weight="700" fill="#1B2A4A">${label}</text>`;
+  $("kcards").appendChild(g);
+  const home = [[300, 300], [720, 260], [520, 430], [860, 420], [300, 600], [720, 610]][i];
+  const away = [[150, 250], [760, 190], [430, 470], [1010, 360], [170, 700], [820, 740]][i];
+  return { g, home, away, dim: [1, 0.35, 1, 0.35, 0.5, 1][i], rot: [-6, 4, -3, 7, 5, -5][i] };
+});
+
+// הכרטיסים נכנסים לתוך המשטח, ולכן מעליו
+$("panel").after($("kcards")); $("kcards").before($("need"));
+const longPath = $("longPath"), longLen = longPath.getTotalLength();
+const shortPath = $("shortPath"), shortLen = shortPath.getTotalLength();
+const crack = $("crack"), crackLen = crack.getTotalLength();
+const srcPaths = ["srcP1", "srcP2", "srcP3"].map($);
+srcPaths.forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.dataset.len = L; });
+crack.style.strokeDasharray = crackLen;
+shortPath.style.strokeDasharray = shortLen;
+
+/* ===== הרינדור: הכול מחושב מזמן אחד ===== */
+function render(t) {
+  // כתוביות
+  const sc = DATA.scenes.find(s => t >= s.start && t < s.end) || DATA.scenes[DATA.scenes.length - 1];
+  const cap = $("cap");
+  if (cap.textContent !== sc.text) cap.textContent = sc.text;
+  const capOn = sc.n === 10 ? fade(t, 52.2, 56.9, 0.45) : fade(t, sc.start + 0.15, sc.end - 0.05, 0.45);
+  cap.style.opacity = capOn.toFixed(3);
+  cap.style.transform = `translateY(${((1 - prog(t, sc.start + 0.15, sc.start + 0.7)) * 10).toFixed(1)}px)`;
+
+  // השולחן
+  op($("desk"), Math.max(fade(t, -1, 10.6, 0.6), fade(t, 16, 42.4, 0.6)));
+  tf($("devSeat"), 1280, 600 + Math.sin(t * 1.4) * 1.5, 1.55);
+
+  op($("nameTag"), fade(t, 0.3, 10.3, 0.5));
+  tf($("nameTag"), 1280, 715 + (1 - prog(t, 0.3, 0.9, easeOut)) * 12, 1);
+
+  // צורך חדש: נוחת (1), נשאר (2), נכנס למשטח (4)
+  const needDrop = prog(t, 0.5, 1.8, easeOut);
+  const needIn = prog(t, 17.2, 19.6);
+  let nx = 1000, ny = lerp(160, 590, needDrop);
+  let ns = 1;
+  if (t >= 16) { nx = lerp(1000, 905, needIn); ny = lerp(590, 470, needIn); ns = lerp(1, 0.6, needIn); }
+  tf($("need"), nx, ny, ns, (1 - needDrop) * -8);
+  op($("need"), Math.max(fade(t, 0.5, 10.5, 0.3), fade(t, 16.2, 20, 0.4)));
+
+  // כרטיסי הידע
+  K.forEach((k, i) => {
+    const appear = prog(t, 5.2 + i * 0.22, 5.9 + i * 0.22, easeOut);
+    const drift = prog(t, 7.2, 10);
+    let x = lerp(k.home[0], k.away[0], drift), y = lerp(k.home[1], k.away[1], drift);
+    let s = lerp(0.7, 1, appear), r = k.rot * drift;
+    let o = Math.min(appear, lerp(1, k.dim, drift)) * (1 - prog(t, 10, 10.6));
+    if (t >= 16) {
+      const back = prog(t, 16.1, 16.7);
+      const go = prog(t, 17 + i * 0.3, 19 + i * 0.3);
+      const tx = [905, 690, 495][i % 3], ty = 470;
+      const cx = lerp(k.away[0], tx, go), cy = lerp(k.away[1], ty, go) - Math.sin(go * Math.PI) * 60;
+      x = cx; y = cy; s = lerp(1, 0.35, go); r = k.rot * (1 - go);
+      o = back * (1 - prog(t, 18.6 + i * 0.3, 19.2 + i * 0.3)) * (t < 22 ? 1 : 0);
+    }
+    tf(k.g, x, y, s, r); op(k.g, o);
+  });
+
+  // השביל (3)
+  op($("pathScene"), fade(t, 10.2, 16, 0.6));
+  const draw = prog(t, 10.3, 12, easeOut);
+  longPath.style.strokeDashoffset = 0;
+  longPath.style.opacity = draw.toFixed(3);
+  const walk = prog(t, 11, 14.2, (x) => x);
+  const pt = longPath.getPointAtLength(walk * longLen);
+  tf($("walker"), pt.x, pt.y - 4 + Math.abs(Math.sin(walk * 40)) * -5, 1);
+  const crackK = prog(t, 14.2, 15, easeOut);
+  op($("crackCard"), prog(t, 12.6, 13.4));
+  crack.style.strokeDashoffset = (crackLen * (1 - crackK)).toFixed(1);
+  $("crackRect").setAttribute("stroke", crackK > 0.05 ? "#B4561E" : "#1B2A4A");
+  tf($("crackCard"), 300 + (crackK > 0 && crackK < 1 ? Math.sin(t * 60) * 2 : 0), 280, 1, crackK * -3);
+
+  // המקורות והמשטח (4–7)
+  op($("srcs"), fade(t, 16.4, 23, 0.6));
+  srcPaths.forEach((p, i) => { p.style.strokeDashoffset = (p.dataset.len * (1 - prog(t, 16.8 + i * 0.35, 18.6 + i * 0.35))).toFixed(1); });
+  ["src1", "src2", "src3"].forEach((id, i) => {
+    const a = prog(t, 16.5 + i * 0.3, 17.2 + i * 0.3, easeOut);
+    tf($(id), 150, [250, 480, 700][i], lerp(0.85, 1, a));
+  });
+  const panelOn = fade(t, 16.3, 42.6, 0.6);
+  op($("panel"), panelOn);
+
+  // בלוקים (5)
+  const bIn = [0, 1, 2].map(i => prog(t, 22.2 + i * 0.35, 22.9 + i * 0.35, easeOut));
+  [["b1", 905], ["b2", 690], ["b3", 495]].forEach(([id, x], i) => { tf($(id), x, 470 + (1 - bIn[i]) * 24, lerp(0.85, 1, bIn[i])); op($(id), bIn[i]); });
+  const arrK = prog(t, 23.2, 24);
+  ["arr1", "arr2", "ah1", "ah2"].forEach(id => op($(id), arrK));
+  op($("marker"), prog(t, 24.2, 24.8));
+  tf($("marker"), 690, 380 - (1 - prog(t, 24.2, 24.9, easeOut)) * 40 + Math.sin(t * 3) * 3, 1);
+  op($("missing"), prog(t, 25.3, 26) * (1 - prog(t, 37, 37.6)));
+
+  // אתגור (6)
+  const flagK = prog(t, 28.4, 29.1, easeOut);
+  op($("flag"), flagK * (1 - prog(t, 36.2, 36.6)));
+  tf($("flag"), 745, 420, lerp(0.4, 1, flagK), Math.sin(t * 5) * 2 * flagK);
+  $("b2r").setAttribute("stroke", t >= 28.4 && t < 36.4 ? "#E0A544" : (t >= 36.4 && t < 42 ? "#2F7D78" : "#1B2A4A"));
+  $("b2r").setAttribute("fill", t >= 36.4 && t < 42 ? "#E3F0EE" : "#F2EFE8");
+  $("b2r").setAttribute("stroke-width", t >= 28.4 && t < 42 ? "5" : "3");
+  const bub = fade(t, 29.4, 35.2, 0.45);
+  op($("bubble"), bub);
+  tf($("bubble"), 40, (1 - prog(t, 29.4, 30)) * 16, 1);
+
+  // שינוי, מודל חי, הצעד הבא (7)
+  const edit = prog(t, 35.6, 36.4);
+  tf($("b2"), 690 + Math.sin(edit * Math.PI * 3) * 6 * (1 - edit), 470 + (1 - bIn[1]) * 24, lerp(0.85, 1, bIn[1]));
+  op($("check"), prog(t, 36.4, 36.9) * (1 - prog(t, 41.6, 42)));
+  tf($("check"), 745, 420, lerp(0.5, 1, prog(t, 36.4, 36.9, easeOut)));
+  const pulse1 = Math.sin(clamp((t - 36.9) / 0.7) * Math.PI), pulse3 = Math.sin(clamp((t - 37.3) / 0.7) * Math.PI);
+  $("b1r").setAttribute("stroke", pulse1 > 0.2 ? "#2F7D78" : "#1B2A4A");
+  $("b3r").setAttribute("stroke", pulse3 > 0.2 ? "#2F7D78" : "#1B2A4A");
+  tf($("b1"), 905, 470 + (1 - bIn[0]) * 24, lerp(0.85, 1, bIn[0]) * (1 + pulse1 * 0.05));
+  tf($("b3"), 495, 470 + (1 - bIn[2]) * 24, lerp(0.85, 1, bIn[2]) * (1 + pulse3 * 0.05));
+  const chipsOn = fade(t, 38, 42.4, 0.5);
+  op($("chips"), chipsOn);
+  tf($("chip1"), 880, 790 + (1 - prog(t, 38, 38.6, easeOut)) * 20, 1);
+  tf($("chip2"), 520, 790 + (1 - prog(t, 38.2, 38.8, easeOut)) * 20, 1);
+  const mv = prog(t, 39.2, 40.4);
+  tf($("cursor"), lerp(1150, 900, mv), lerp(880, 795, mv), 1);
+  const picked = t >= 40.6;
+  $("chip1r").setAttribute("fill", picked ? "#1B2A4A" : "#fff");
+  $("chip1t").setAttribute("fill", picked ? "#fff" : "#1B2A4A");
+  op($("chip2"), (picked ? lerp(1, 0.35, prog(t, 40.6, 41.1)) : 1) * prog(t, 38.2, 38.8));
+  op($("cursor"), prog(t, 39.1, 39.4) * (1 - prog(t, 41, 41.4)));
+
+  // שותפים (8)
+  op($("meet"), fade(t, 42.3, 52.2, 0.6));
+  [["badge1", 975, 43.0], ["badge2", 705, 43.6]].forEach(([id, x, at]) => {
+    const k = prog(t, at, at + 0.6, easeOut); op($(id), k); tf($(id), x, 500 + (1 - k) * 16, lerp(0.85, 1, k));
+  });
+  const stK = prog(t, 49.3, 49.8, easeOut);
+  op($("stamp"), stK); tf($("stamp"), 840, 600, lerp(1.35, 1, stK), -4);
+  tf($("board"), 0, (1 - prog(t, 42.3, 43, easeOut)) * 20, 1);
+  const nodA = Math.max(0, Math.sin(clamp((t - 48) / 1.2) * Math.PI * 2)) * 6;
+  const nodB = Math.max(0, Math.sin(clamp((t - 48.5) / 1.2) * Math.PI * 2)) * 6;
+  $("pAhead").setAttribute("transform", `rotate(${nodA.toFixed(2)} 0 -60)`);
+  $("pBhead").setAttribute("transform", `rotate(${nodB.toFixed(2)} 0 -60)`);
+  tf($("devStand"), 1260, 700, 1.35, Math.sin(t * 1.2) * 0.6);
+
+  // שביל קצר (9)
+  op($("shortScene"), fade(t, 52.1, 57.2, 0.5));
+  shortPath.style.strokeDashoffset = (shortLen * (1 - prog(t, 52.2, 53.4, easeOut))).toFixed(1);
+  const w2 = prog(t, 52.6, 54.6, (x) => x);
+  const p2 = shortPath.getPointAtLength(w2 * shortLen);
+  tf($("walker2"), p2.x, p2.y - 4 + Math.abs(Math.sin(w2 * 26)) * -5, 1);
+  [["cp1", 0.25], ["cp2", 0.5], ["cp3", 0.75]].forEach(([id, at]) => {
+    const k = clamp((w2 - at) / 0.08);
+    op($(id), k); tf($(id), +$(id).dataset.x, +$(id).dataset.y, lerp(0.5, 1, easeOut(k)));
+  });
+  const endK = prog(t, 56.8, 57.6);
+  op($("endCard"), endK);
+  $("endLine").setAttribute("width", (280 * prog(t, 57.4, 58.2, easeOut)).toFixed(1));
+  $("endLine").setAttribute("x", (800 - 140 * prog(t, 57.4, 58.2, easeOut)).toFixed(1));
+}
+[["cp1", 1030, 650], ["cp2", 800, 600], ["cp3", 570, 652]].forEach(([id, x, y]) => { $(id).dataset.x = x; $(id).dataset.y = y; });
+
+
+/* ===== צלילים: נוצרים בקוד, בלי קבצים. מנגינה קלילה במז'ור, וצליל קטן ברגעי המפתח ===== */
+const SOUND = {
+  step: 0.3,              // שמינית, כ-100 פעימות לדקה
+  musicFrom: 0.4, musicTo: 56.7,
+  // D · A · Bm · G, תיבה לכל אקורד (8 שמיניות)
+  bars: [
+    { bass: 73.42, arp: [293.66, 369.99, 440.00, 587.33] },
+    { bass: 55.00, arp: [277.18, 329.63, 440.00, 554.37] },
+    { bass: 61.74, arp: [246.94, 293.66, 369.99, 493.88] },
+    { bass: 49.00, arp: [246.94, 293.66, 392.00, 493.88] }
+  ],
+  pattern: [0, 2, 1, 3, 2, 1, 3, 2],
+  cues: [
+    { at: 1.75, k: "pop", f: 880 },
+    ...[0, 1, 2, 3, 4, 5].map(i => ({ at: 5.25 + i * 0.22, k: "pop", f: [587.33, 659.25, 739.99, 880, 739.99, 659.25][i], v: 0.03 })),
+    { at: 14.25, k: "crack" },
+    ...[0, 1, 2].map(i => ({ at: 16.9 + i * 0.35, k: "pop", f: [739.99, 880, 1174.66][i], v: 0.03 })),
+    ...[0, 1, 2].map(i => ({ at: 22.25 + i * 0.35, k: "pop", f: [587.33, 739.99, 880][i], v: 0.035 })),
+    { at: 28.45, k: "flag" },
+    { at: 36.45, k: "chime" },
+    { at: 40.6, k: "pop", f: 1174.66, v: 0.035 },
+    { at: 43.0, k: "pop", f: 739.99, v: 0.035 }, { at: 43.6, k: "pop", f: 880, v: 0.035 },
+    { at: 49.3, k: "chime" },
+    ...[0, 1, 2].map(i => ({ at: 53.1 + i * 0.5, k: "pop", f: [880, 1108.73, 1174.66][i], v: 0.035 })),
+    { at: 56.9, k: "end" }
+  ]
+};
+const Sfx = (() => {
+  let ctx = null, master = null, muted = false;
+  try { muted = localStorage.getItem("deevo-muted") === "1"; } catch (e) {}
+  function init() {
+    if (ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctx = new AC();
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 5000;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 2.5;
+    master = ctx.createGain(); master.gain.value = muted ? 0 : 1;
+    master.connect(lp); lp.connect(comp); comp.connect(ctx.destination);
+  }
+  function env(g, at, peak, attack, decay) {
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(peak, at + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + attack + decay);
+  }
+  // צליל עגול ונקי, בסגנון מרימבה: צליל יסוד, ועוד הרמוניה רכה שדועכת מהר
+  function mallet(f, at, v = 0.03, decay = 0.5) {
+    const g = ctx.createGain(); g.connect(master); env(g, at, v, 0.005, decay);
+    const o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f; o.connect(g);
+    const g2 = ctx.createGain(); g2.connect(master); env(g2, at, v * 0.25, 0.003, decay * 0.25);
+    const o2 = ctx.createOscillator(); o2.type = "sine"; o2.frequency.value = f * 4; o2.connect(g2);
+    o.start(at); o2.start(at); o.stop(at + decay + 0.1); o2.stop(at + decay + 0.1);
+  }
+  function bass(f, at, v = 0.05) {
+    const g = ctx.createGain(); g.connect(master); env(g, at, v, 0.02, 1.1);
+    const o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f * 2; o.connect(g);
+    o.start(at); o.stop(at + 1.2);
+  }
+  function noise(at, v, d, f) {
+    const len = Math.ceil(ctx.sampleRate * (d + 0.05)), buf = ctx.createBuffer(1, len, ctx.sampleRate), ch = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource(), flt = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = buf; flt.type = "bandpass"; flt.frequency.value = f; flt.Q.value = 0.9;
+    src.connect(flt); flt.connect(g); g.connect(master); env(g, at, v, 0.004, d); src.start(at); src.stop(at + d + 0.05);
+  }
+  const play = {
+    pop:   (at, c) => mallet(c.f, at, c.v || 0.04, 0.35),
+    crack: (at) => { noise(at, 0.025, 0.12, 1600); mallet(329.63, at + 0.05, 0.03, 0.5); mallet(311.13, at + 0.2, 0.025, 0.6); },
+    flag:  (at) => { mallet(880, at, 0.035, 0.3); mallet(739.99, at + 0.15, 0.035, 0.45); },
+    chime: (at) => { mallet(1174.66, at, 0.04, 0.8); mallet(1479.98, at + 0.08, 0.03, 0.9); },
+    end:   (at) => { [587.33, 739.99, 880, 1174.66].forEach((f, i) => mallet(f, at + i * 0.13, 0.035, 1.6)); bass(73.42, at, 0.05); }
+  };
+  // המנגינה: כל שמינית שזמנה עבר בין הפריים הקודם לנוכחי
+  function music(prev, tt, base) {
+    const st = SOUND.step;
+    for (let k = Math.floor(prev / st) + 1; k * st <= tt; k++) {
+      const time = k * st;
+      if (time < SOUND.musicFrom || time > SOUND.musicTo) continue;
+      const bar = SOUND.bars[Math.floor(k / 8) % 4], i = k % 8;
+      const at = base + Math.max(0, time - tt);
+      const fadeIn = Math.min(1, (time - SOUND.musicFrom) / 2.4);
+      mallet(bar.arp[SOUND.pattern[i]], at, 0.022 * fadeIn, i % 2 ? 0.3 : 0.45);
+      if (i === 0) bass(bar.bass, at, 0.045 * fadeIn);
+      if (i === 4) bass(bar.bass * 1.5, at, 0.025 * fadeIn);
+    }
+  }
+  return {
+    start() { init(); if (ctx && ctx.state === "suspended") ctx.resume(); },
+    stop() {},
+    seek() {},
+    advance(prev, tt) {
+      if (!ctx || muted || ctx.state !== "running" || tt - prev > 0.5) return;
+      const base = ctx.currentTime + 0.03;
+      music(prev, tt, base);
+      SOUND.cues.forEach(c => { if (c.at > prev && c.at <= tt) play[c.k](base, c); });
+    },
+    toggleMute() {
+      muted = !muted;
+      try { localStorage.setItem("deevo-muted", muted ? "1" : "0"); } catch (e) {}
+      if (ctx) master.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, 0.05);
+      return muted;
+    },
+    get muted() { return muted; }
+  };
+})();
+
+/* ===== הנגן ===== */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let t = 0, playing = false, last = 0;
+const seek = $("seek"), timeEl = $("time");
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+// בלי תליאת: כל סצנה מוצגת במצב המיושב שלה, ומתחלפת בחיתוך
+function shown(tt) {
+  if (!reduce) return tt;
+  const s = DATA.scenes.find(x => tt >= x.start && tt < x.end) || DATA.scenes[DATA.scenes.length - 1];
+  const settle = { 1: 4, 2: 7, 3: 15.6, 4: 21.5, 5: 27.5, 6: 33, 7: 41.5, 8: 46.5, 9: 51.5, 10: 55.5 }[s.n];
+  return settle;
+}
+function draw() {
+  render(shown(t));
+  seek.value = t.toFixed(2);
+  timeEl.textContent = `${fmt(t)} / ${fmt(DATA.duration)}`;
+}
+function setPlaying(p) {
+  playing = p;
+  $("icoPlay").style.display = p ? "none" : "";
+  $("icoPause").style.display = p ? "" : "none";
+  $("playBtn").setAttribute("aria-label", p ? "השהיה" : "ניגון");
+  if (p) { last = null; Sfx.start(t); requestAnimationFrame(tick); } else { Sfx.stop(); }
+}
+function tick(now) {
+  if (!playing) return;
+  if (last === null) last = now;
+  const prev = t;
+  t = clamp(t + Math.max(0, now - last) / 1000, 0, DATA.duration);
+  last = now;
+  Sfx.advance(prev, t);
+  draw();
+  if (t >= DATA.duration) { setPlaying(false); $("endOverlay").hidden = false; return; }
+  requestAnimationFrame(tick);
+}
+function start(from = 0) {
+  t = from; $("startOverlay").hidden = true; $("endOverlay").hidden = true; draw(); setPlaying(true);
+}
+$("startBtn").onclick = () => start(0);
+$("replayBtn").onclick = () => start(0);
+$("restartBtn").onclick = () => start(0);
+$("playBtn").onclick = () => {
+  if (!$("startOverlay").hidden) return start(0);
+  if (t >= DATA.duration) return start(0);
+  setPlaying(!playing);
+};
+seek.oninput = () => {
+  t = +seek.value; $("startOverlay").hidden = true; $("endOverlay").hidden = t < DATA.duration; Sfx.seek(t); draw();
+};
+function syncMute() {
+  const m = Sfx.muted;
+  $("icoSound").style.display = m ? "none" : ""; $("icoMute").style.display = m ? "" : "none";
+  $("muteBtn").setAttribute("aria-pressed", String(m)); $("muteBtn").setAttribute("aria-label", m ? "ביטול השתקה" : "השתקה");
+}
+$("muteBtn").onclick = () => { Sfx.toggleMute(); syncMute(); };
+syncMute();
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space" && !(e.target instanceof HTMLInputElement)) { e.preventDefault(); $("playBtn").click(); }
+});
+
+// לבדיקות: ‎#t=12.5 פותח את הסרטון עצור בשנייה הזו
+const m = location.hash.match(/t=([\d.]+)/);
+if (m) { t = Math.min(DATA.duration, +m[1]); $("startOverlay").hidden = true; }
+draw();
+</script>
+</body>
+</html>
