@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>סרטון המחשת הקונספט — קריינות נעמה (1.5×) | Gov-Labs מחזור 11</title>
+  <style>
+    :root {
+      --bg: #0F1217;
+      --surface: #151A23;
+      --card: #1A1F29;
+      --border: #2D3748;
+      --accent: #F2C230;
+      --text: #F1F5F9;
+      --muted: #94A3B8;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+    }
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px 20px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .title-group h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+    .title-group p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      background: rgba(242, 194, 48, 0.14);
+      border: 1px solid rgba(242, 194, 48, 0.4);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #0F1217;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 8px;
+      transition: opacity 0.15s ease;
+    }
+    .btn:hover { opacity: 0.9; }
+    .player-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+    video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 75vh;
+      display: block;
+      background: #000000;
+      border-radius: 8px;
+    }
+    .caption {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <div class="title-group">
+        <h1>🎬 סרטון המחשת הקונספט — תוכנית עבודה חיה</h1>
+        <p>Gov-Labs מחזור 11 · pmo · prof-units-interface · יום 3 (הצעת ערך ובדיקת קונספט)</p>
+      </div>
+      <div class="actions">
+        <span class="badge">קריינות נעמה · מהירות 1.5× · 68.6 שניות</span>
+        <a class="btn" href="concept-animation-video-naama-1.5x.mp4" download="concept-animation-video-naama-1.5x.mp4">⬇ הורד MP4</a>
+      </div>
+    </header>
+
+    <section class="player-card" aria-label="נגן סרטון המחשת הקונספט">
+      <video controls playsinline preload="metadata">
+        <source src="concept-animation-video-naama-1.5x.mp4" type="video/mp4">
+        הדפדפן שלך אינו תומך בהצגת וידאו HTML5. ניתן להוריד את הקובץ ישירות:
+        <a href="concept-animation-video-naama-1.5x.mp4">concept-animation-video-naama-1.5x.mp4</a>.
+      </video>
+    </section>
+
+    <p class="caption">
+      המסר המרכזי: מתוכנית עבודה שמתה באפריל — לתוכנית אחת חיה, שקופה ומסונכרנת כל השנה.
+    </p>
+  </main>
+</body>
+</html>
